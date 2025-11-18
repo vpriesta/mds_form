@@ -76,7 +76,7 @@ def upsert_activity(activity_id: str, user_id: str, payload: Dict[str, Any], sta
             "data": payload,
             "status": status
         }
-        res = sup.table("activities").upsert(row, on_conflict="id").execute()
+        res = sup.table("activities").upsert(row, on_conflict="activity_id").execute()
         if res.error:
             logger.error("Upsert error: %s", res.error.message if getattr(res, "error", None) else res)
             return False, None
