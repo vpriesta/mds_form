@@ -4,7 +4,6 @@ from pathlib import Path
 from datetime import datetime
 
 # Supabase client helpers (from your supabase_client.py)
-st.write("RAW ACTIVITIES:", activities)
 
 from supabase_client import (
     list_activities_for_user,
@@ -111,6 +110,8 @@ for row in activities:
         "last_saved": last_saved,
         "raw": row,
     })
+
+st.write("RAW ACTIVITIES:", activities)
 
 # UI helpers
 def status_color(status):
