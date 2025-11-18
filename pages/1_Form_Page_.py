@@ -27,6 +27,9 @@ st.session_state.setdefault("current_activity_id", None)
 st.session_state.setdefault("username", "unknown_user")
 st.session_state.setdefault("role", "user")
 
+username = st.session_state["username"]
+role = st.session_state["role"]
+
 # ===================================================== 
 # 2️⃣ HELPER LOAD & SAVE SUPABASE 
 # ===================================================== 
