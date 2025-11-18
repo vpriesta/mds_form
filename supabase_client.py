@@ -84,7 +84,7 @@ def upsert_activity(activity_id: str, user_id: str, payload: Dict[str, Any], sta
 
         row = make_json_safe(row)   # <── penting banget, cegah date bocor!
 
-        logger.debug("UPSERT DATA RAW: %s", data)
+        logger.debug("UPSERT DATA RAW: %s", row)
 
         res = sup.table("activities").upsert(row, on_conflict="activity_id").execute()
         
