@@ -4,7 +4,7 @@ from pathlib import Path
 from datetime import datetime
 
 # Supabase client helpers (from your supabase_client.py)
-st.write("DEBUG username: ", st.session_state.get("username"))
+st.write("RAW ACTIVITIES:", activities)
 
 from supabase_client import (
     list_activities_for_user,
