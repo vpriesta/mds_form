@@ -68,22 +68,45 @@ else:
 # Normalize entries into the shape your UI expects (fallbacks for older/local JSON)
 form_list = []
 for row in activities:
-    # row can contain keys: id, user_id, data (dict), status, updated_at
-    activity_id = row.get("id") or row.get("activity_id") or (row.get("data") or {}).get("activity_id")
-    owner = row.get("user_id") or (row.get("data") or {}).get("owner")
-    status = (row.get("status") or (row.get("data") or {}).get("status") or "Draft").title()
     data = row.get("data") or {}
-    title = (data.get("halaman_awal", {}) or {}).get("judul") or data.get("judul") or "(Untitled Activity)"
-    last_saved = data.get("last_saved") or row.get("updated_at") or data.get("last_saved") or "Unknown"
+
+    activity_id = (
+        row.get("activity_id")
+        or row.get("id")
+        or data.get("activity_id")
+    )
+
+    owner = (
+        row.get("user_id")
+        or data.get("owner")
+        or "unknown"
+    )
+
+    status = (
+        row.get("status")
+        or data.get("status")
+        or "draft"
+    ).title()
+
+    title = (
+        data.get("halaman_awal", {}).get("judul")
+        or data.get("judul")
+        or f"Activity {activity_id}"
+    )
+
+    last_saved = (
+        data.get("last_saved")
+        or row.get("updated_at")
+        or "Unknown"
+    )
 
     form_list.append({
-        "raw_row": row,
         "activity_id": activity_id,
-        "owner": user_id,
+        "owner": owner,
         "status": status,
-        "halaman_awal": data.get("halaman_awal", {}),
+        "title": title,
         "last_saved": last_saved,
-        "title": title
+        "raw": row,
     })
 
 # UI helpers
@@ -112,7 +135,7 @@ else:
 
         with st.expander(f"{status_color(status)} {activity_title}", expanded=False):
             st.write(f"**Status:** {status}")
-            st.write(f"**Owner:** {item.get('user_id', 'unknown')}")
+            st.write(f"**Owner:** {item.get('owner', 'unknown')}")
             st.write(f"**Last Saved:** {last_saved}")
 
             col1, col2 = st.columns(2)
