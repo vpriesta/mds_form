@@ -65,7 +65,7 @@ else:
     from supabase_client import list_all_activities
     activities = list_all_activities()
 
-st.write("DEBUG - Raw activities from Supabase:", activities)
+# st.write("DEBUG - Raw activities from Supabase:", activities)
 
 # Normalize entries into the shape your UI expects (fallbacks for older/local JSON)
 form_list = []
@@ -111,7 +111,7 @@ for row in activities:
         "raw": row,
     })
 
-st.write("RAW ACTIVITIES:", activities)
+# st.write("RAW ACTIVITIES:", activities)
 
 # UI helpers
 def status_color(status):
