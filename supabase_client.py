@@ -91,80 +91,81 @@ def get_activity(activity_id: str) -> Optional[Dict]:
     """
     sup = get_supabase_client()
     try:
-        res = sup.table("activities").select("*").eq("activity_id", activity_id).single().execute()
-        if res.error:
-            # Not found or other error
-            logger.debug("get_activity error: %s", res.error.message if getattr(res, "error", None) else res)
+        res = sup.table("activities").select("*").eq("activity_id", activity_id).execute()
+        if not res.data:
             return None
-        return res.data
+
+        return res.data[0]
+
     except Exception:
         logger.exception("Exception in get_activity")
         return None
 
 
-def list_all_activities():
-    """Return all activities without filtering by user or status."""
+def list_all_activities() -> List[Dict]:
     sup = get_supabase_client()
     try:
-        response = sup.table("activities").select("*").order("updated_at", desc=True).execute()
-        return response.data or []
-    except Exception as e:
-        print("❌ Error listing all activities:", e)
+        res = sup.table("activities").select("*").order("updated_at", desc=True).execute()
+        return res.data or []
+
+    except Exception:
+        logger.exception("Exception in list_all_activities")
         return []
 
 
 def list_activities_for_user(user_id: str, status: Optional[str] = None, limit: int = 200) -> List[Dict]:
-    """
-    List activities for a given user. Optionally filter by status.
-    """
     sup = get_supabase_client()
     try:
-        qry = sup.table("activities").select("*").eq("user_id", user_id).order("updated_at", desc=True).limit(limit)
+        qry = (
+            sup.table("activities")
+            .select("*")
+            .eq("user_id", user_id)
+            .order("updated_at", desc=True)
+            .limit(limit)
+        )
+
         if status:
             qry = qry.eq("status", status)
+
         res = qry.execute()
-        if res.error:
-            logger.error("list_activities_for_user error: %s", res.error)
-            return []
         return res.data or []
+
     except Exception:
         logger.exception("Exception in list_activities_for_user")
         return []
 
 
 def list_submitted_activities(limit: int = 500) -> List[Dict]:
-    """
-    Return activities with status='submitted'. Used by verifier page.
-    """
     sup = get_supabase_client()
     try:
-        res = sup.table("activities").select("*").eq("status", "submitted").order("updated_at", desc=True).limit(limit).execute()
-        if res.error:
-            logger.error("list_submitted_activities error: %s", res.error)
-            return []
+        res = (
+            sup.table("activities")
+            .select("*")
+            .eq("status", "submitted")
+            .order("updated_at", desc=True)
+            .limit(limit)
+            .execute()
+        )
         return res.data or []
+
     except Exception:
         logger.exception("Exception in list_submitted_activities")
         return []
 
 
 def mark_status(activity_id: str, status: str, verifier: Optional[str] = None, comment: Optional[str] = None) -> bool:
-    """
-    Update status of an activity. Adds verifier and comment metadata if provided.
-    """
     sup = get_supabase_client()
     try:
         update_payload = {"status": status}
+
         if verifier:
             update_payload["verified_by"] = verifier
         if comment:
             update_payload["verifier_comment"] = comment
 
-        res = sup.table("activities").update(update_payload).eq("activity_id", activity_id).execute()
-        if res.error:
-            logger.error("mark_status error: %s", res.error)
-            return False
+        sup.table("activities").update(update_payload).eq("activity_id", activity_id).execute()
         return True
+
     except Exception:
         logger.exception("Exception in mark_status")
         return False
@@ -173,11 +174,9 @@ def mark_status(activity_id: str, status: str, verifier: Optional[str] = None, c
 def delete_activity(activity_id: str) -> bool:
     sup = get_supabase_client()
     try:
-        res = sup.table("activities").delete().eq("activity_id", activity_id).execute()
-        if res.error:
-            logger.error("delete_activity error: %s", res.error)
-            return False
+        sup.table("activities").delete().eq("activity_id", activity_id).execute()
         return True
+
     except Exception:
         logger.exception("Exception in delete_activity")
         return False
@@ -187,27 +186,15 @@ def delete_activity(activity_id: str) -> bool:
 #  Convenience helpers
 # -------------------------
 def submit_activity(activity_id: str, user_id: str) -> bool:
-    """
-    Mark an activity as submitted. Also sets submitted timestamp inside data if possible.
-    """
-    # try to attach submitted_at inside data jsonb (optional)
     current = get_activity(activity_id)
     if not current:
         logger.error("submit_activity: not found %s", activity_id)
         return False
 
-    data = current.get("data", {}) or {}
-    data["submitted_at"] = data.get("submitted_at") or None  # placeholder, will be replaced below
-
-    # We will use server side timestamp by updating status; optional to store timestamp in data
-    success = mark_status(activity_id, "submitted")
-    return success
+    return mark_status(activity_id, "submitted")
 
 
 def mark_verified(activity_id: str, verifier: str, comment: Optional[str] = None) -> bool:
-    """
-    Mark activity as verified. Useful for automation that moves to company DB later.
-    """
     return mark_status(activity_id, "verified", verifier=verifier, comment=comment)
 
 
