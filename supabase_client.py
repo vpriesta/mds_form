@@ -71,7 +71,7 @@ def upsert_activity(activity_id: str, user_id: str, payload: Dict[str, Any], sta
     sup = get_supabase_client()
     try:
         row = {
-            "id": activity_id,
+            "activity_id": activity_id,
             "user_id": user_id,
             "data": payload,
             "status": status
@@ -94,7 +94,7 @@ def get_activity(activity_id: str) -> Optional[Dict]:
     """
     sup = get_supabase_client()
     try:
-        res = sup.table("activities").select("*").eq("id", activity_id).single().execute()
+        res = sup.table("activities").select("*").eq("activity_id", activity_id).single().execute()
         if res.error:
             # Not found or other error
             logger.debug("get_activity error: %s", res.error.message if getattr(res, "error", None) else res)
@@ -163,7 +163,7 @@ def mark_status(activity_id: str, status: str, verifier: Optional[str] = None, c
         if comment:
             update_payload["verifier_comment"] = comment
 
-        res = sup.table("activities").update(update_payload).eq("id", activity_id).execute()
+        res = sup.table("activities").update(update_payload).eq("activity_id", activity_id).execute()
         if res.error:
             logger.error("mark_status error: %s", res.error)
             return False
@@ -176,7 +176,7 @@ def mark_status(activity_id: str, status: str, verifier: Optional[str] = None, c
 def delete_activity(activity_id: str) -> bool:
     sup = get_supabase_client()
     try:
-        res = sup.table("activities").delete().eq("id", activity_id).execute()
+        res = sup.table("activities").delete().eq("activity_id", activity_id).execute()
         if res.error:
             logger.error("delete_activity error: %s", res.error)
             return False
