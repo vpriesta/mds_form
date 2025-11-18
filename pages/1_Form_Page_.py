@@ -36,7 +36,9 @@ def load_form(activity_id, username):
     if not row: 
         return None # wajib cocok owner 
     if row.get("user_id") != username: 
-        return None return row.get("data", None) 
+        return None 
+    
+    return row.get("data", None) 
         
 def save_form(activity_id, username, data): 
     """Simpan draft ke Supabase.""" 
