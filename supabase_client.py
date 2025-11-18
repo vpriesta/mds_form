@@ -4,6 +4,7 @@ import json
 import logging
 import streamlit as st
 import datetime
+import decimal
 
 # supabase-py client
 from supabase import create_client, Client
@@ -57,19 +58,22 @@ def get_supabase_client() -> Client:
 # -------------------------
 #  Helper functions
 # -------------------------
-def convert_dates(obj):
+def make_json_safe(obj):
+    """Recursively convert objects into JSON-serializable formats."""
     if isinstance(obj, dict):
-        return {k: convert_dates(v) for k, v in obj.items()}
+        return {k: make_json_safe(v) for k, v in obj.items()}
     elif isinstance(obj, list):
-        return [convert_dates(v) for v in obj]
-    elif isinstance(obj, datetime.date):
-        return obj.isoformat()  # YYYY-MM-DD
+        return [make_json_safe(v) for v in obj]
+    elif isinstance(obj, (datetime.date, datetime.datetime)):
+        return obj.isoformat()
+    elif isinstance(obj, decimal.Decimal):
+        return float(obj)
     return obj
 
 def upsert_activity(activity_id: str, user_id: str, payload: Dict[str, Any], status: str = "draft"):
     sup = get_supabase_client()
     try:
-        clean_payload = convert_dates(payload)
+        clean_payload = make_json_safe(payload)
 
         row = {
             "activity_id": activity_id,
@@ -77,14 +81,18 @@ def upsert_activity(activity_id: str, user_id: str, payload: Dict[str, Any], sta
             "data": clean_payload,
             "status": status
         }
-        
+
+        row = make_json_safe(row)   # <── penting banget, cegah date bocor!
+
         res = sup.table("activities").upsert(row, on_conflict="activity_id").execute()
+        
         data = res.data[0] if isinstance(res.data, list) and res.data else res.data
         return True, data
 
     except Exception as e:
         logger.exception("Exception in upsert_activity: %s", str(e))
         return False, None
+
 
 
 def get_activity(activity_id: str) -> Optional[Dict]:
