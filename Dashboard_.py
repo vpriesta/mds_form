@@ -79,7 +79,7 @@ for row in activities:
     form_list.append({
         "raw_row": row,
         "activity_id": activity_id,
-        "owner": owner,
+        "owner": user_id,
         "status": status,
         "halaman_awal": data.get("halaman_awal", {}),
         "last_saved": last_saved,
@@ -112,7 +112,7 @@ else:
 
         with st.expander(f"{status_color(status)} {activity_title}", expanded=False):
             st.write(f"**Status:** {status}")
-            st.write(f"**Owner:** {item.get('owner', 'unknown')}")
+            st.write(f"**Owner:** {item.get('user_id', 'unknown')}")
             st.write(f"**Last Saved:** {last_saved}")
 
             col1, col2 = st.columns(2)
