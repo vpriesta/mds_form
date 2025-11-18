@@ -99,9 +99,9 @@ if is_submitted:
 else: 
     st.success("You can edit and save this activity before submission.")
 
-# ===================================================== 
-# 6️⃣ ALWAYS GUARANTEE FORM STRUCTURE (PAKAI STRUKTUR KAMU) 
-# ===================================================== 
+# =====================================================
+# 6️⃣ ALWAYS GUARANTEE FORM STRUCTURE (FIXED VERSION)
+# =====================================================
 sections = [
     "halaman_awal",
     "blok_1_3",
@@ -109,12 +109,18 @@ sections = [
     "blok_4",
     "blok_5",
     "blok_6_8",
-    "indicators",] 
-for sec in sections: 
-    if sec not in st.session_state.form_data: 
-        st.session_state.form_data[sec] = [] if sec == "variables" else {} 
-# streamlit state untuk input 
-st.session_state.setdefault(sec, st.session_state.form_data[sec])
+    "indicators",
+]
+
+for sec in sections:
+    # kalau belum ada di data form
+    if sec not in st.session_state.form_data:
+        st.session_state.form_data[sec] = [] if sec == "variables" else {}
+
+    # kalau belum ada di session_state
+    if sec not in st.session_state:
+        st.session_state[sec] = st.session_state.form_data[sec]
+
 
 # ===== Page tabs =====
 tab1, tab2, tab3 = st.tabs(["📘 MS Kegiatan", "📊 MS Indikator", "📈 MS Variabel"])
