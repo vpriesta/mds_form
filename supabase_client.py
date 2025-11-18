@@ -3,6 +3,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import json
 import logging
 import streamlit as st
+import datetime
 
 # supabase-py client
 from supabase import create_client, Client
@@ -56,30 +57,31 @@ def get_supabase_client() -> Client:
 # -------------------------
 #  Helper functions
 # -------------------------
-def upsert_activity(activity_id: str, user_id: str, payload: Dict[str, Any], status: str = "draft") -> Tuple[bool, Optional[Dict]]:
-    """
-    Insert or update an activity record in the 'activities' table.
+def convert_dates(obj):
+    if isinstance(obj, dict):
+        return {k: convert_dates(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [convert_dates(v) for v in obj]
+    elif isinstance(obj, datetime.date):
+        return obj.isoformat()  # YYYY-MM-DD
+    return obj
 
-    Arguments:
-      - activity_id: unique id for the activity (uuid or string)
-      - user_id: owner identifier
-      - payload: dict -> will be stored in `data` jsonb column
-      - status: draft/submitted/verified/rejected/etc.
-
-    Returns: (success, row_dict_or_none)
-    """
+def upsert_activity(activity_id: str, user_id: str, payload: Dict[str, Any], status: str = "draft"):
     sup = get_supabase_client()
     try:
+        clean_payload = convert_dates(payload)
+
         row = {
             "activity_id": activity_id,
             "user_id": user_id,
-            "data": payload,
+            "data": clean_payload,
             "status": status
         }
+        
         res = sup.table("activities").upsert(row, on_conflict="activity_id").execute()
-        # res.data may be a list
         data = res.data[0] if isinstance(res.data, list) and res.data else res.data
         return True, data
+
     except Exception as e:
         logger.exception("Exception in upsert_activity: %s", str(e))
         return False, None
