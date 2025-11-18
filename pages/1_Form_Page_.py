@@ -30,7 +30,8 @@ st.session_state.setdefault("role", "user")
 # ===================================================== 
 # 2️⃣ HELPER LOAD & SAVE SUPABASE 
 # ===================================================== 
-def load_form(activity_id, username): """Ambil data dari Supabase.""" 
+def load_form(activity_id, username): 
+    """Ambil data dari Supabase.""" 
     row = get_activity(activity_id) 
     if not row: 
         return None # wajib cocok owner 
