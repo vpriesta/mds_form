@@ -97,7 +97,7 @@ if edit_id:
     status = row.get("status")
     notes = row.get("data").get("revision_note")
     verif_date = row.get("data").get("revision_requested_at")
-    rn = row.get("data").get("rejectin_reason")
+    rn = row.get("data").get("rejection_reason")
     reject_date = row.get("data").get("rejected_at")
     verified_at = row.get("data").get("verified_at")
     if role == "user" and (status == "submitted" or status == "verified" or status == "rejected"):
