@@ -134,8 +134,7 @@ if not edit_id:
 # status = row.get("status")
 # is_submitted = status == "Submitted" 
 
-st.write("### 📄 Activity Form") 
-st.write(f"Catatan Revisi: {notes}")
+st.write("### 📄 Activity Form")
 
 # is_readonly = False
 
@@ -147,6 +146,8 @@ if is_readonly:
     st.info("This activity has been **submitted** and cannot be edited.") 
 else: 
     st.success("You can edit and save this activity before submission.")
+
+st.info(f"ℹ️ Catatan Revisi:\n\n{notes}")
 
 # =====================================================
 # 6️⃣ ALWAYS GUARANTEE FORM STRUCTURE (FIXED VERSION)
