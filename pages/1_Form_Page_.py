@@ -145,7 +145,7 @@ for sec in sections:
     if sec not in st.session_state:
         st.session_state[sec] = st.session_state.form_data[sec]
 
-is_editable = (status == "draft" or status == "revision_requested" status == "Draft")
+is_editable = (status == "draft" or status == "revision_requested" or status == "Draft")
 
 # ===== Page tabs =====
 tab1, tab2, tab3 = st.tabs(["📘 MS Kegiatan", "📊 MS Indikator", "📈 MS Variabel"])
