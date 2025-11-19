@@ -100,6 +100,7 @@ for idx, act in enumerate(submitted):
         # =====================================================
         with col1:
             if st.button(f"✅ Accept", key=f"accept_{idx}"):
+                data["verified_at"] = datetime.now().isoformat()
 
                 ok, _ = upsert_activity(
                     activity_id=activity_id,
