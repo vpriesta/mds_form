@@ -146,18 +146,18 @@ st.write("### 📄 Activity Form")
 #         is_readonly = True
     
 if is_readonly: 
-    st.info("This activity has been **submitted** and cannot be edited.") 
+    st.info(f"This activity has been **{status}** and cannot be edited.") 
 else: 
     st.success("You can edit and save this activity before submission.")
 
 
-if edit_id:
-    col1, col2 = st.columns(2)
-    with col1:
-        st.info(f"ℹ️ Catatan Revisi:\n{notes}\n\nTanggal Pemeriksaan: {verif_date}")
+if status == "revision_requested":
+    st.info(f"ℹ️ Catatan Revisi:\n{notes}\n\nTanggal Pemeriksaan: {verif_date}")
 
-    with col2:
-        st.info(f"❌ Alasan Ditolak:\n{rn}\n\nTanggal Ditolak: {reject_date}")
+elif status == "rejected":
+    st.info(f"❌ Alasan Ditolak:\n{rn}\n\nTanggal Ditolak: {reject_date}")
+else:
+    None
 
 # =====================================================
 # 6️⃣ ALWAYS GUARANTEE FORM STRUCTURE (FIXED VERSION)
