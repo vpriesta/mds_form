@@ -151,11 +151,13 @@ else:
     st.success("You can edit and save this activity before submission.")
 
 
-if status == "revision_requested":
+if edit_id:
     st.info(f"ℹ️ Catatan Revisi:\n{notes}\n\nTanggal Pemeriksaan: {verif_date}")
 
-elif status == "rejected":
+if status == "rejected":
     st.info(f"❌ Alasan Ditolak:\n{rn}\n\nTanggal Ditolak: {reject_date}")
+elif status == "accepted":
+    st.info(f"✅ Metadata telah diverifikasi dan diterima\n\nTanggal Diterima: {verified_at}")
 else:
     None
 
