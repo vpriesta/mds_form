@@ -148,7 +148,8 @@ if is_readonly:
 else: 
     st.success("You can edit and save this activity before submission.")
 
-st.info(f"ℹ️ Catatan Revisi:\n\n{notes}")
+if edit_id:
+    st.info(f"ℹ️ Catatan Revisi:\n\n{notes}")
 
 # =====================================================
 # 6️⃣ ALWAYS GUARANTEE FORM STRUCTURE (FIXED VERSION)
