@@ -145,7 +145,7 @@ for sec in sections:
     if sec not in st.session_state:
         st.session_state[sec] = st.session_state.form_data[sec]
 
-is_editable = (status == "draft" or status == "revision_requested" or status == "Draft")
+is_editable = (status == "Submitted" or status == "Verified" or status == "Rejected")
 
 # ===== Page tabs =====
 tab1, tab2, tab3 = st.tabs(["📘 MS Kegiatan", "📊 MS Indikator", "📈 MS Variabel"])
@@ -168,7 +168,7 @@ with tab1:
             index = jenis_options.index(stored_value) if stored_value in jenis_options else None,
             key="jenis_statistik",
             horizontal=True,
-            disabled = not is_editable
+            disabled = is_editable
         )
         st.session_state["halaman_awal"]["jenis_statistik"] = jenis_statistik
 
@@ -181,23 +181,23 @@ with tab1:
             index = rekomendasi_options.index(stored_value) if stored_value in rekomendasi_options else None,
             key="rekomendasi",
             horizontal=True,
-            disabled = not is_editable            
+            disabled = is_editable            
         )
         st.session_state["halaman_awal"]["rekomendasi"] = rekomendasi
 
         if rekomendasi == "Ya":
-            rekomendasi_id = st.text_input("Masukkan ID Rekomendasi", value=st.session_state["halaman_awal"].get("rekomendasi_id", ""), placeholder="Wajib diisi jika kegiatan ini adalah rekomendasi", disabled = not is_editable
+            rekomendasi_id = st.text_input("Masukkan ID Rekomendasi", value=st.session_state["halaman_awal"].get("rekomendasi_id", ""), placeholder="Wajib diisi jika kegiatan ini adalah rekomendasi", disabled = is_editable
                                           )
         else:
-            rekomendasi_id = st.text_input("Masukkan ID Rekomendasi", value="", placeholder="Wajib diisi jika kegiatan ini adalah rekomendasi", disabled = not is_editable)
+            rekomendasi_id = st.text_input("Masukkan ID Rekomendasi", value="", placeholder="Wajib diisi jika kegiatan ini adalah rekomendasi", disabled = is_editable)
         st.session_state["halaman_awal"]["rekomendasi_id"] = rekomendasi_id
 
         # 3. Judul
-        judul = st.text_input("Judul Kegiatan", value=st.session_state["halaman_awal"].get("judul", None), key = "judul", disabled = not is_editable)
+        judul = st.text_input("Judul Kegiatan", value=st.session_state["halaman_awal"].get("judul", None), key = "judul", disabled = is_editable)
         st.session_state["halaman_awal"]["judul"] = judul
 
         # 4. Tahun
-        tahun = st.number_input("Tahun", min_value=0, max_value=3000, step=1, value=st.session_state["halaman_awal"].get("tahun", 0), key = "tahun", disabled = not is_editable)
+        tahun = st.number_input("Tahun", min_value=0, max_value=3000, step=1, value=st.session_state["halaman_awal"].get("tahun", 0), key = "tahun", disabled = is_editable)
         st.session_state["halaman_awal"]["tahun"] = tahun
 
         # 5. Cara Pengumpulan
@@ -208,7 +208,7 @@ with tab1:
             pengumpulan_options,
             index = pengumpulan_options.index(stored_value) if stored_value in pengumpulan_options else None,
             key="cara_pengumpulan",
-            disabled = not is_editable
+            disabled = is_editable
         )
         st.session_state["halaman_awal"]["cara_pengumpulan"] = cara_pengumpulan
 
@@ -225,11 +225,11 @@ with tab1:
             sektor_options,
             index = sektor_options.index(stored_value) if stored_value in sektor_options else None,
             key="sektor",
-            disabled = not is_editable
+            disabled = is_editable
         )
         st.session_state["halaman_awal"]["sektor"] = sektor
 
-        submit_halaman_awal = st.form_submit_button("💾 Simpan Halaman Awal", disabled = not is_editable)
+        submit_halaman_awal = st.form_submit_button("💾 Simpan Halaman Awal", disabled = is_editable)
 
         if submit_halaman_awal: 
             new_entry = {
@@ -332,27 +332,27 @@ with tab1:
         st.markdown("#### 2.1 Unit Eselon Penanggung Jawab", unsafe_allow_html=True)
         col1, col2 = st.columns(2)
         with col1:
-            ii_unit_eselon1 = st.text_input("Eselon I", value=st.session_state["blok_1_3"].get("ii_unit_eselon1", ""), key="ii_unit_eselon1", disabled = not is_editable)
+            ii_unit_eselon1 = st.text_input("Eselon I", value=st.session_state["blok_1_3"].get("ii_unit_eselon1", ""), key="ii_unit_eselon1", disabled = is_editable)
             st.session_state["blok_1_3"]["ii_unit_eselon1"] = ii_unit_eselon1
         with col2:
-            ii_unit_eselon2 = st.text_input("Eselon II", value=st.session_state["blok_1_3"].get("ii_unit_eselon2", ""), key="ii_unit_eselon2", disabled = not is_editable)
+            ii_unit_eselon2 = st.text_input("Eselon II", value=st.session_state["blok_1_3"].get("ii_unit_eselon2", ""), key="ii_unit_eselon2", disabled = is_editable)
             st.session_state["blok_1_3"]["ii_unit_eselon2"] = ii_unit_eselon2
     
         st.markdown("#### 2.2 Penanggung Jawab Teknis", unsafe_allow_html=True)
         col1, col2 = st.columns(2)
         with col1:
-            ii_pj_nama = st.text_input("Nama", value=st.session_state["blok_1_3"].get("ii_pj_nama", ""), key="ii_pj_nama", disabled = not is_editable)
+            ii_pj_nama = st.text_input("Nama", value=st.session_state["blok_1_3"].get("ii_pj_nama", ""), key="ii_pj_nama", disabled = is_editable)
             st.session_state["blok_1_3"]["ii_pj_nama"] = ii_pj_nama
-            ii_pj_jabatan = st.text_input("Jabatan", value=st.session_state["blok_1_3"].get("ii_pj_jabatan", ""), key="ii_pj_jabatan", disabled = not is_editable)
+            ii_pj_jabatan = st.text_input("Jabatan", value=st.session_state["blok_1_3"].get("ii_pj_jabatan", ""), key="ii_pj_jabatan", disabled = is_editable)
             st.session_state["blok_1_3"]["ii_pj_jabatan"] = ii_pj_jabatan
-            ii_pj_alamat = st.text_area("Alamat", value=st.session_state["blok_1_3"].get("ii_pj_alamat", ""), key="ii_pj_alamat", disabled = not is_editable)
+            ii_pj_alamat = st.text_area("Alamat", value=st.session_state["blok_1_3"].get("ii_pj_alamat", ""), key="ii_pj_alamat", disabled = is_editable)
             st.session_state["blok_1_3"]["ii_pj_alamat"] = ii_pj_alamat
         with col2:
-            ii_pj_telepon = st.text_input("Telepon", value=st.session_state["blok_1_3"].get("ii_pj_telepon", ""), key="ii_pj_telepon", disabled = not is_editable)
+            ii_pj_telepon = st.text_input("Telepon", value=st.session_state["blok_1_3"].get("ii_pj_telepon", ""), key="ii_pj_telepon", disabled = is_editable)
             st.session_state["blok_1_3"]["ii_pj_telepon"] = ii_pj_telepon
-            ii_pj_email = st.text_input("Email", value=st.session_state["blok_1_3"].get("ii_pj_email", ""), key="ii_pj_email", disabled = not is_editable)
+            ii_pj_email = st.text_input("Email", value=st.session_state["blok_1_3"].get("ii_pj_email", ""), key="ii_pj_email", disabled = is_editable)
             st.session_state["blok_1_3"]["ii_pj_email"] = ii_pj_email
-            ii_pj_faksimile = st.text_input("Faksimile", value=st.session_state["blok_1_3"].get("ii_pj_faksimile", ""), key="ii_pj_faksimile", disabled = not is_editable)
+            ii_pj_faksimile = st.text_input("Faksimile", value=st.session_state["blok_1_3"].get("ii_pj_faksimile", ""), key="ii_pj_faksimile", disabled = is_editable)
             st.session_state["blok_1_3"]["ii_pj_faksimile"] = ii_pj_faksimile
 
     # st.divider()
@@ -361,12 +361,12 @@ with tab1:
             
         # --- 3.1 Background ---
         st.markdown("#### 3.1 Latar Belakang Kegiatan", unsafe_allow_html=True)
-        iii_latar_belakang_kegiatan = st.text_area("Tuliskan latar belakang kegiatan", value=st.session_state["blok_1_3"].get("iii_latar_belakang_kegiatan", ""), key="iii_latar_belakang_kegiatan", disabled = not is_editable)
+        iii_latar_belakang_kegiatan = st.text_area("Tuliskan latar belakang kegiatan", value=st.session_state["blok_1_3"].get("iii_latar_belakang_kegiatan", ""), key="iii_latar_belakang_kegiatan", disabled = is_editable)
         st.session_state["blok_1_3"]["iii_latar_belakang_kegiatan"] = iii_latar_belakang_kegiatan
     
         # --- 3.2 Objective ---
         st.markdown("#### 3.2 Tujuan Kegiatan", unsafe_allow_html=True)
-        iii_tujuan_kegiatan = st.text_area("Tuliskan tujuan kegiatan", value=st.session_state["blok_1_3"].get("iii_tujuan_kegiatan", ""), key="iii_tujuan_kegiatan", disabled = not is_editable)
+        iii_tujuan_kegiatan = st.text_area("Tuliskan tujuan kegiatan", value=st.session_state["blok_1_3"].get("iii_tujuan_kegiatan", ""), key="iii_tujuan_kegiatan", disabled = is_editable)
         st.session_state["blok_1_3"]["iii_tujuan_kegiatan"] = iii_tujuan_kegiatan
     
         # --- 3.3 Schedule ---
@@ -381,7 +381,7 @@ with tab1:
                     label,
                     value=st.session_state["blok_1_3"].get(start_key, None),
                     key=start_key,
-                    disabled = not is_editable
+                    disabled = is_editable
                 )
             with col_:
                 st.text_input("", value="hingga", disabled=True, key=f"hingga_{label}")
@@ -389,7 +389,7 @@ with tab1:
                 st.session_state["blok_1_3"][end_key] = st.date_input(
                     "",
                     value=st.session_state["blok_1_3"].get(end_key, None),
-                    key=end_key,disabled = not is_editable
+                    key=end_key,disabled = is_editable
                 )
 
         def save_date(start_key, end_key):
@@ -526,7 +526,7 @@ with tab1:
             key="iv_frekuensi_penyelenggaraan",
             label_visibility = "collapsed",
             horizontal = True,
-            disabled = not is_editable
+            disabled = is_editable
         )
 
         if iv_frekuensi_penyelenggaraan == "Hanya Sekali":
@@ -548,7 +548,7 @@ with tab1:
             key="iv_tipe_pengumpulan_data",
             label_visibility = "collapsed",
             horizontal=True,
-            disabled = not is_editable
+            disabled = is_editable
         )
         st.session_state["blok_4"]["iv_tipe_pengumpulan_data"] = iv_tipe_pengumpulan_data
 
@@ -567,7 +567,7 @@ with tab1:
             default = stored_value if isinstance(stored_value, list) else [],
             label_visibility = "collapsed",
             key="iv_sebagian_cakupan_wilayah_pengumpulan_data",
-            disabled = not is_editable
+            disabled = is_editable
         )
 
         if iv_sebagian_cakupan_wilayah_pengumpulan_data == "SELURUH WILAYAH INDONESIA":
@@ -592,11 +592,11 @@ with tab1:
             default = stored_value if isinstance(stored_value, list) else [],
             label_visibility = "collapsed",
             key="metode_utama",
-            disabled = not is_editable
+            disabled = is_editable
         )
         st.session_state["blok_4"]["metode_utama"] = metode_utama
 
-        metode_lain = st.text_input("Lainnya: Sebutkan metode pengumpulan lain", value=st.session_state["blok_4"].get("metode_lain", ""), key="metode_lain", placeholder = "Wajib diisi jika memilih opsi 'Lainnya'", disabled = not is_editable)
+        metode_lain = st.text_input("Lainnya: Sebutkan metode pengumpulan lain", value=st.session_state["blok_4"].get("metode_lain", ""), key="metode_lain", placeholder = "Wajib diisi jika memilih opsi 'Lainnya'", disabled = is_editable)
         st.session_state["blok_4"]["metode_lain"] = metode_lain
         iv_metode_pengumpulan_data = metode_utama.copy()
         if "Lainnya" in iv_metode_pengumpulan_data:
@@ -621,11 +621,11 @@ with tab1:
             default = stored_value if isinstance(stored_value, list) else [],
             label_visibility = "collapsed",
             key="sarana_utama",
-            disabled = not is_editable
+            disabled = is_editable
         )
         st.session_state["blok_4"]["sarana_utama"] = sarana_utama
 
-        sarana_lain = st.text_input("Lainnya: Sebutkan sarana pengumpulan lain", value=st.session_state["blok_4"].get("sarana_lain", ""), key="sarana_lain", placeholder = "Wajib diisi jika memilih opsi 'Lainnya'", disabled = not is_editable)
+        sarana_lain = st.text_input("Lainnya: Sebutkan sarana pengumpulan lain", value=st.session_state["blok_4"].get("sarana_lain", ""), key="sarana_lain", placeholder = "Wajib diisi jika memilih opsi 'Lainnya'", disabled = is_editable)
         st.session_state["blok_4"]["sarana_lain"] = sarana_lain
         iv_sarana_pengumpulan_data = sarana_utama.copy()
         if "Lainnya" in iv_sarana_pengumpulan_data:
@@ -649,11 +649,11 @@ with tab1:
             default = stored_value if isinstance(stored_value, list) else [],
             label_visibility = "collapsed",
             key="unit_utama",
-            disabled = not is_editable
+            disabled = is_editable
         )
         st.session_state["blok_4"]["unit_utama"] = unit_utama
 
-        unit_lain = st.text_input("Lainnya: Sebutkan unit pengumpulan lain", value=st.session_state["blok_4"].get("unit_lain", ""), key="unit_lain", placeholder = "Wajib diisi jika memilih opsi 'Lainnya'", disabled = not is_editable)
+        unit_lain = st.text_input("Lainnya: Sebutkan unit pengumpulan lain", value=st.session_state["blok_4"].get("unit_lain", ""), key="unit_lain", placeholder = "Wajib diisi jika memilih opsi 'Lainnya'", disabled = is_editable)
         st.session_state["blok_4"]["unit_lain"] = unit_lain
         iv_unit_pengumpulan_data = unit_utama.copy()
         if "Lainnya" in iv_unit_pengumpulan_data:
@@ -708,7 +708,7 @@ with tab1:
                 key="v_jenis_rancangan_sampel",
                 label_visibility = "collapsed",
                 horizontal=True,
-                disabled = not is_editable
+                disabled = is_editable
             )
             st.session_state["blok_5"]["v_jenis_rancangan_sampel"] = v_jenis_rancangan_sampel
     
@@ -717,8 +717,8 @@ with tab1:
             stored_sampel_nonprob = st.session_state["blok_5"].get("sampel_nonprob", "")
             st.markdown("##### 5.2 Metode Pemilihan Sampel Tahap Terakhir")
             st.markdown("Pilih salah satu")
-            sampel_prob = st.checkbox("Sampel Probabilitas", value=st.session_state["blok_5"].get("sampel_prob", ""), disabled = not is_editable)
-            sampel_nonprob = st.checkbox("Sampel Nonprobabilitas", value=st.session_state["blok_5"].get("sampel_nonprob", ""), disabled = not is_editable)
+            sampel_prob = st.checkbox("Sampel Probabilitas", value=st.session_state["blok_5"].get("sampel_prob", ""), disabled = is_editable)
+            sampel_nonprob = st.checkbox("Sampel Nonprobabilitas", value=st.session_state["blok_5"].get("sampel_nonprob", ""), disabled = is_editable)
             st.session_state["blok_5"]["sampel_prob"] = sampel_prob
             st.session_state["blok_5"]["sampel_nonprob"] = sampel_nonprob
     
@@ -740,7 +740,7 @@ with tab1:
                     key="v_metode_yang_digunakan",
                     label_visibility = "collapsed",
                     horizontal=True,
-                    disabled = not is_editable
+                    disabled = is_editable
                 )
                 st.session_state["blok_5"]["v_metode_yang_digunakan"] = v_metode_yang_digunakan
     
@@ -754,7 +754,7 @@ with tab1:
                     key="v_kerangka_sampel_tahap_akhir",
                     label_visibility = "collapsed",
                     horizontal=True,
-                    disabled = not is_editable
+                    disabled = is_editable
                 )
                 st.session_state["blok_5"]["v_kerangka_sampel_tahap_akhir"] = v_kerangka_sampel_tahap_akhir
     
@@ -764,7 +764,7 @@ with tab1:
                                                            label_visibility = "collapsed",
                                                            placeholder = "Tuliskan fraksi sampel keseluruhan",
                                                            key="v_fraksi_sampel_keseluruhan",
-                                                          disabled = not is_editable)
+                                                          disabled = is_editable)
                 st.session_state["blok_5"]["v_fraksi_sampel_keseluruhan"] = v_fraksi_sampel_keseluruhan
     
                 st.markdown("#### 5.6 Nilai Perkiraan Sampling Error Variabel Utama", unsafe_allow_html=True)
@@ -773,7 +773,7 @@ with tab1:
                                                                         label_visibility = "collapsed",
                                                                         placeholder = "Tuliskan nilai perkiraan sampling error variabel utama",
                                                                         key="v_nilai_perkiraan_sampling_error_variabel_utama",
-                                                                              disabled = not is_editable)
+                                                                              disabled = is_editable)
                 st.session_state["blok_5"]["v_nilai_perkiraan_sampling_error_variabel_utama"] = v_nilai_perkiraan_sampling_error_variabel_utama
     
             if sampel_nonprob:
@@ -788,18 +788,18 @@ with tab1:
                     key="v_metode_yang_digunakan",
                     label_visibility = "collapsed",
                     horizontal=True,
-                    disabled = not is_editable
+                    disabled = is_editable
                 )
                 st.session_state["blok_5"]["v_metode_yang_digunakan"] = v_metode_yang_digunakan
     
             st.markdown("#### 5.7 Unit Sampel", unsafe_allow_html=True)
             v_unit_sampel = st.text_area("5.7 Unit Sampel", value=st.session_state["blok_5"].get("v_unit_sampel", ""), label_visibility = "collapsed",
-                                         placeholder = "Tuliskan unit sampel", key="v_unit_sampel", disabled = not is_editable)
+                                         placeholder = "Tuliskan unit sampel", key="v_unit_sampel", disabled = is_editable)
             st.session_state["blok_5"]["v_unit_sampel"] = v_unit_sampel
     
             st.markdown("#### 5.8 Unit Observasi", unsafe_allow_html=True)
             v_unit_observasi = st.text_area("5.8 Unit Observasi", value=st.session_state["blok_5"].get("v_unit_observasi", ""), label_visibility = "collapsed",
-                                         placeholder = "Tuliskan unit observasi", key="v_unit_observasi", disabled = not is_editable)
+                                         placeholder = "Tuliskan unit observasi", key="v_unit_observasi", disabled = is_editable)
             st.session_state["blok_5"]["v_unit_observasi"] = v_unit_observasi
     
                 
@@ -835,7 +835,7 @@ with tab1:
         #Q6.1
         with col1:
             stored_value = st.session_state["blok_6_8"].get("vi_apakah_melakukan_uji_coba", "")
-            vi_apakah_melakukan_uji_coba = st.checkbox("Melakukan Uji Coba (Pilot Survey)", value=st.session_state["blok_6_8"].get("vi_apakah_melakukan_uji_coba", ""), disabled = not is_editable)
+            vi_apakah_melakukan_uji_coba = st.checkbox("Melakukan Uji Coba (Pilot Survey)", value=st.session_state["blok_6_8"].get("vi_apakah_melakukan_uji_coba", ""), disabled = is_editable)
             st.session_state["blok_6_8"]["vi_apakah_melakukan_uji_coba"] = vi_apakah_melakukan_uji_coba
 
         #Q6.3
@@ -843,7 +843,7 @@ with tab1:
 
             stored_value = st.session_state["blok_6_8"].get("vi_apakah_melakukan_penyesuaian_nonrespon", "")
             vi_apakah_melakukan_penyesuaian_nonrespon = st.checkbox("Melakukan Penyesuaian Nonrespon",
-                                                                    value=st.session_state["blok_6_8"].get("vi_apakah_melakukan_penyesuaian_nonrespon", ""), disabled = not is_editable)
+                                                                    value=st.session_state["blok_6_8"].get("vi_apakah_melakukan_penyesuaian_nonrespon", ""), disabled = is_editable)
             st.session_state["blok_6_8"]["vi_apakah_melakukan_penyesuaian_nonrespon"] = vi_apakah_melakukan_penyesuaian_nonrespon
             
         
@@ -857,11 +857,11 @@ with tab1:
             default = stored_value if isinstance(stored_value, list) else [],
             label_visibility = "collapsed",
             key="vi_metode_pemeriksaan_kualitas_pengumpulan_data",
-            disabled = not is_editable
+            disabled = is_editable
         )
         st.session_state["blok_6_8"]["qc_utama"] = qc_utama
 
-        qc_lain = st.text_input("Lainnya: Sebutkan metode pemeriksaan kualitas lain", value=st.session_state["blok_6_8"].get("qc_lain", ""), key="qc_lain", placeholder = "Wajib diisi jika memilih opsi 'Lainnya'", disabled = not is_editable)
+        qc_lain = st.text_input("Lainnya: Sebutkan metode pemeriksaan kualitas lain", value=st.session_state["blok_6_8"].get("qc_lain", ""), key="qc_lain", placeholder = "Wajib diisi jika memilih opsi 'Lainnya'", disabled = is_editable)
         st.session_state["blok_6_8"]["qc_lain"] = qc_lain
         vi_metode_pemeriksaan_kualitas_pengumpulan_data = qc_utama.copy()
         if "Lainnya" in vi_metode_pemeriksaan_kualitas_pengumpulan_data:
@@ -895,7 +895,7 @@ with tab1:
                 key="vi_petugas_pengumpulan_data",
                 label_visibility = "collapsed",
                 horizontal=True,
-                disabled = not is_editable
+                disabled = is_editable
             )
             st.session_state["blok_6_8"]["vi_petugas_pengumpulan_data"] = vi_petugas_pengumpulan_data
 
@@ -910,21 +910,21 @@ with tab1:
                 key="vi_persyaratan_pendidikan_terendah_petugas_pengumpulan_data",
                 label_visibility = "collapsed",
                 horizontal=True,
-                disabled = not is_editable
+                disabled = is_editable
             )
             st.session_state["blok_6_8"]["vi_persyaratan_pendidikan_terendah_petugas_pengumpulan_data"] = vi_persyaratan_pendidikan_terendah_petugas_pengumpulan_data
 
             #Q6.6
             st.markdown("##### 6.6 Jumlah Petugas")
-            vi_jumlah_petugas_supervisor = st.number_input("Supervisor/Penyelia/Pengawas", min_value=0, max_value=3000, step=1, value=st.session_state["blok_6_8"].get("vi_jumlah_petugas_supervisor", None), key = "vi_jumlah_petugas_supervisor", disabled = not is_editable)
+            vi_jumlah_petugas_supervisor = st.number_input("Supervisor/Penyelia/Pengawas", min_value=0, max_value=3000, step=1, value=st.session_state["blok_6_8"].get("vi_jumlah_petugas_supervisor", None), key = "vi_jumlah_petugas_supervisor", disabled = is_editable)
             st.session_state["blok_6_8"]["vi_jumlah_petugas_supervisor"] = vi_jumlah_petugas_supervisor
-            vi_jumlah_petugas_enumerator = st.number_input("Pengumpul Data/Enumerator", min_value=0, max_value=3000, step=1, value=st.session_state["blok_6_8"].get("vi_jumlah_petugas_enumerator", None), key = "vi_jumlah_petugas_enumerator", placeholder = "Tidak boleh kurang dari jumlah Supervisor/Penyelia/Pengawas", disabled = not is_editable)
+            vi_jumlah_petugas_enumerator = st.number_input("Pengumpul Data/Enumerator", min_value=0, max_value=3000, step=1, value=st.session_state["blok_6_8"].get("vi_jumlah_petugas_enumerator", None), key = "vi_jumlah_petugas_enumerator", placeholder = "Tidak boleh kurang dari jumlah Supervisor/Penyelia/Pengawas", disabled = is_editable)
             st.session_state["blok_6_8"]["vi_jumlah_petugas_enumerator"] = vi_jumlah_petugas_enumerator          
 
         #Q6.7
         stored_value = st.session_state["blok_6_8"].get("vi_apakah_melakukan_pelatihan_petugas", "")
         vi_apakah_melakukan_pelatihan_petugas = st.checkbox("Melakukan Pelatihan Tugas",
-                                                                value=st.session_state["blok_6_8"].get("vi_apakah_melakukan_pelatihan_petugas", ""), disabled = not is_editable)
+                                                                value=st.session_state["blok_6_8"].get("vi_apakah_melakukan_pelatihan_petugas", ""), disabled = is_editable)
         st.session_state["blok_6_8"]["vi_apakah_melakukan_pelatihan_petugas"] = vi_apakah_melakukan_pelatihan_petugas      
    
     # st.divider()
@@ -935,19 +935,19 @@ with tab1:
         tahapan_list = []
         st.markdown("##### 7.1 Tahapan Pengolahan Data")
         stored_value = st.session_state["blok_6_8"].get("penyuntingan", "")
-        penyuntingan = st.checkbox("Penyuntingan (Editing)", value=st.session_state["blok_6_8"].get("penyuntingan", ""), disabled = not is_editable)
+        penyuntingan = st.checkbox("Penyuntingan (Editing)", value=st.session_state["blok_6_8"].get("penyuntingan", ""), disabled = is_editable)
         st.session_state["blok_6_8"]["penyuntingan"] = penyuntingan
         if penyuntingan:
             tahapan_list.append("Penyuntingan (Editing)")
 
         stored_value = st.session_state["blok_6_8"].get("penyandian", "")
-        penyandian = st.checkbox("Penyandian (Coding)", value=st.session_state["blok_6_8"].get("penyandian", ""), disabled = not is_editable)
+        penyandian = st.checkbox("Penyandian (Coding)", value=st.session_state["blok_6_8"].get("penyandian", ""), disabled = is_editable)
         st.session_state["blok_6_8"]["penyandian"] = penyandian
         if penyandian:
             tahapan_list.append("Penyandian (Coding)")
         
         stored_value = st.session_state["blok_6_8"].get("entry", "")
-        entry = st.checkbox("Data Entry", value=st.session_state["blok_6_8"].get("entry", ""), disabled = not is_editable)
+        entry = st.checkbox("Data Entry", value=st.session_state["blok_6_8"].get("entry", ""), disabled = is_editable)
         st.session_state["blok_6_8"]["entry"] = entry
         if entry:
             tahapan_list.append("Data Entry")
@@ -955,7 +955,7 @@ with tab1:
         st.session_state["blok_6_8"]["vii_tahapan_pengolahan_data"] = tahapan_list
 
         stored_value = st.session_state["blok_6_8"].get("penyahihan", "")
-        penyahihan = st.checkbox("Penyahihan (Validasi)", value=st.session_state["blok_6_8"].get("penyahihan", ""), disabled = not is_editable)
+        penyahihan = st.checkbox("Penyahihan (Validasi)", value=st.session_state["blok_6_8"].get("penyahihan", ""), disabled = is_editable)
         st.session_state["blok_6_8"]["penyahihan"] = penyahihan
         if penyahihan:
             tahapan_list.append("Penyahihan (Validasi)")
@@ -971,7 +971,7 @@ with tab1:
             key="vii_metode_analisis",
             label_visibility = "collapsed",
             horizontal=True,
-            disabled = not is_editable
+            disabled = is_editable
         )
         st.session_state["blok_6_8"]["vii_metode_analisis"] = vii_metode_analisis
 
@@ -985,7 +985,7 @@ with tab1:
             default = stored_value if isinstance(stored_value, list) else [],
             label_visibility = "collapsed",
             key="unit_analisis_utama",
-            disabled = not is_editable
+            disabled = is_editable
         )
         st.session_state["blok_6_8"]["unit_analisis_utama"] = unit_analisis_utama
 
@@ -1014,7 +1014,7 @@ with tab1:
             default = stored_value if isinstance(stored_value, list) else [],
             label_visibility = "collapsed",
             key="penyajian_utama",
-            disabled = not is_editable
+            disabled = is_editable
         )
         st.session_state["blok_6_8"]["penyajian_utama"] = penyajian_utama
 
@@ -1040,27 +1040,27 @@ with tab1:
         #Q8.1
         st.markdown("##### 8.1 Produk Kegiatan yang Tersedia untuk Umum")
         stored_value = st.session_state["blok_6_8"].get("viii_ketersediaan_produk_tercetak", "")
-        viii_ketersediaan_produk_tercetak = st.checkbox("Tercetak (Hardcopy)", value=st.session_state["blok_6_8"].get("viii_ketersediaan_produk_tercetak", ""), disabled = not is_editable)
+        viii_ketersediaan_produk_tercetak = st.checkbox("Tercetak (Hardcopy)", value=st.session_state["blok_6_8"].get("viii_ketersediaan_produk_tercetak", ""), disabled = is_editable)
         st.session_state["blok_6_8"]["viii_ketersediaan_produk_tercetak"] = viii_ketersediaan_produk_tercetak
         viii_rencana_jadwal_rilis_produk_tercetak = ""
         if viii_ketersediaan_produk_tercetak:
-            viii_rencana_jadwal_rilis_produk_tercetak = st.date_input("8.2 Rencana Rilis Produk Kegiatan", value=st.session_state["blok_6_8"].get("viii_rencana_jadwal_rilis_produk_tercetak", None), key="viii_rencana_jadwal_rilis_produk_tercetak", disabled = not is_editable)
+            viii_rencana_jadwal_rilis_produk_tercetak = st.date_input("8.2 Rencana Rilis Produk Kegiatan", value=st.session_state["blok_6_8"].get("viii_rencana_jadwal_rilis_produk_tercetak", None), key="viii_rencana_jadwal_rilis_produk_tercetak", disabled = is_editable)
             st.session_state["blok_6_8"]["viii_rencana_jadwal_rilis_produk_tercetak"] = viii_rencana_jadwal_rilis_produk_tercetak
 
         stored_value = st.session_state["blok_6_8"].get("viii_ketersediaan_produk_digital", "")
-        viii_ketersediaan_produk_digital = st.checkbox("Digital (Softcopy)", value=st.session_state["blok_6_8"].get("viii_ketersediaan_produk_digital", ""), disabled = not is_editable)
+        viii_ketersediaan_produk_digital = st.checkbox("Digital (Softcopy)", value=st.session_state["blok_6_8"].get("viii_ketersediaan_produk_digital", ""), disabled = is_editable)
         st.session_state["blok_6_8"]["viii_ketersediaan_produk_digital"] = viii_ketersediaan_produk_digital
         viii_rencana_jadwal_rilis_produk_digital = ""
         if viii_ketersediaan_produk_digital:
-            viii_rencana_jadwal_rilis_produk_digital = st.date_input("8.2 Rencana Rilis Produk Kegiatan", value=st.session_state["blok_6_8"].get("viii_rencana_jadwal_rilis_produk_digital", None), key="viii_rencana_jadwal_rilis_produk_digital", disabled = not is_editable)
+            viii_rencana_jadwal_rilis_produk_digital = st.date_input("8.2 Rencana Rilis Produk Kegiatan", value=st.session_state["blok_6_8"].get("viii_rencana_jadwal_rilis_produk_digital", None), key="viii_rencana_jadwal_rilis_produk_digital", disabled = is_editable)
             st.session_state["blok_6_8"]["viii_rencana_jadwal_rilis_produk_digital"] = viii_rencana_jadwal_rilis_produk_digital
 
         stored_value = st.session_state["blok_6_8"].get("viii_ketersediaan_produk_mikrodata", "")
-        viii_ketersediaan_produk_mikrodata = st.checkbox("Data Mikro", value=st.session_state["blok_6_8"].get("viii_ketersediaan_produk_mikrodata", ""), disabled = not is_editable)
+        viii_ketersediaan_produk_mikrodata = st.checkbox("Data Mikro", value=st.session_state["blok_6_8"].get("viii_ketersediaan_produk_mikrodata", ""), disabled = is_editable)
         st.session_state["blok_6_8"]["viii_ketersediaan_produk_mikrodata"] = viii_ketersediaan_produk_mikrodata
         viii_rencana_jadwal_rilis_produk_mikrodata = ""
         if viii_ketersediaan_produk_mikrodata:
-            viii_rencana_jadwal_rilis_produk_mikrodata= st.date_input("8.2 Rencana Rilis Produk Kegiatan", value=st.session_state["blok_6_8"].get("viii_rencana_jadwal_rilis_produk_mikrodata", None), key="viii_rencana_jadwal_rilis_produk_mikrodata", disabled = not is_editable)
+            viii_rencana_jadwal_rilis_produk_mikrodata= st.date_input("8.2 Rencana Rilis Produk Kegiatan", value=st.session_state["blok_6_8"].get("viii_rencana_jadwal_rilis_produk_mikrodata", None), key="viii_rencana_jadwal_rilis_produk_mikrodata", disabled = is_editable)
             st.session_state["blok_6_8"]["viii_rencana_jadwal_rilis_produk_mikrodata"] = viii_rencana_jadwal_rilis_produk_mikrodata
 
         # if st.button("💾 Simpan Blok 6 - 8"):
@@ -1100,7 +1100,7 @@ with tab2:
         st.session_state.indicators = []
         
         # Add a new indicators
-    if st.button("➕ Tambah Indikator", disabled = not is_editable):
+    if st.button("➕ Tambah Indikator", disabled = is_editable):
         st.session_state.indicators.append({
             "nama": "",
             "definisi": "",
@@ -1133,31 +1133,31 @@ with tab2:
         ind.setdefault("variabel_pembangun", [])
         with st.expander(f"📘 Indikator {i+1}: {ind.get('nama', '(Belum diisi)')}"):
             ind["nama"] = st.text_input(
-                "Nama Indikator", value=ind.get("nama", ""), key=f"ind_nama_{i}", disabled = not is_editable
+                "Nama Indikator", value=ind.get("nama", ""), key=f"ind_nama_{i}", disabled = is_editable
             )
             ind["definisi"] = st.text_area(
-                "Definisi", value=ind.get("definisi", ""), key=f"ind_definisi_{i}", disabled = not is_editable
+                "Definisi", value=ind.get("definisi", ""), key=f"ind_definisi_{i}", disabled = is_editable
             )
             ind["konsep"] = st.text_input(
-                "Konsep", value=ind.get("konsep", ""), key=f"ind_konsep_{i}", disabled = not is_editable
+                "Konsep", value=ind.get("konsep", ""), key=f"ind_konsep_{i}", disabled = is_editable
             )
             ind["interpretasi"] = st.text_area(
-                "Interpretasi", value=ind.get("interpretasi", ""), key=f"ind_interpretasi_{i}", disabled = not is_editable
+                "Interpretasi", value=ind.get("interpretasi", ""), key=f"ind_interpretasi_{i}", disabled = is_editable
             )
             ind["metode"] = st.text_input(
-                "Metode", value=ind.get("metode", ""), key=f"ind_metode_{i}", disabled = not is_editable
+                "Metode", value=ind.get("metode", ""), key=f"ind_metode_{i}", disabled = is_editable
             )
             ind["ukuran"] = st.text_input(
-                "Ukuran", value=ind.get("ukuran", ""), key=f"ind_ukuran_{i}", disabled = not is_editable
+                "Ukuran", value=ind.get("ukuran", ""), key=f"ind_ukuran_{i}", disabled = is_editable
             )
             ind["satuan"] = st.text_input(
-                "Satuan", value=ind.get("satuan", ""), key=f"ind_satuan_{i}", disabled = not is_editable
+                "Satuan", value=ind.get("satuan", ""), key=f"ind_satuan_{i}", disabled = is_editable
             )
             ind["klasifikasi_penyajian"] = st.text_input(
-                "Klasifikasi Penyajian", value=ind.get("klasifikasi_penyajian", ""), key=f"ind_klasifikasi_penyajian_{i}", disabled = not is_editable
+                "Klasifikasi Penyajian", value=ind.get("klasifikasi_penyajian", ""), key=f"ind_klasifikasi_penyajian_{i}", disabled = is_editable
             )
             ind["indikator_komposit"] = st.checkbox(
-                "Merupakan Indikator Komposit", value=ind.get("indikator_komposit", False), key=f"ind_indikator_komposit_{i}", disabled = not is_editable
+                "Merupakan Indikator Komposit", value=ind.get("indikator_komposit", False), key=f"ind_indikator_komposit_{i}", disabled = is_editable
             )
 
             #================================
@@ -1166,7 +1166,7 @@ with tab2:
             if ind["indikator_komposit"]:
                 st.caption("Jika merupakan indikator komposit, tambahkan satu atau lebih indikator pembangun")
                 with st.popover("Indikator Pembangun"):  
-                    if st.button("➕ Tambah Indikator Pembangun", key = f"add_ind_build_{i}", disabled = not is_editable):
+                    if st.button("➕ Tambah Indikator Pembangun", key = f"add_ind_build_{i}", disabled = is_editable):
                         ind["indikator_pembangun"].append({
                             "nama_indikator_pembangun": "",
                             "publikasi_ketersediaan": ""
@@ -1177,12 +1177,12 @@ with tab2:
                         st.markdown(f"🔹 Indikator Pembangun {j+1}")
                         col1, col2 = st.columns(2)
                         with col1:
-                            sub["nama_indikator_pembangun"] = st.text_input("Nama Indikator Pembangun", value = sub.get("nama_indikator_pembangun", ""), key = f"ind_build_name_{i}_{j}", disabled = not is_editable
+                            sub["nama_indikator_pembangun"] = st.text_input("Nama Indikator Pembangun", value = sub.get("nama_indikator_pembangun", ""), key = f"ind_build_name_{i}_{j}", disabled = is_editable
                                                                            )
                         with col2:
-                            sub["publikasi_ketersediaan"] = st.text_input("Publikasi Ketersediaan", value = sub.get("publikasi_ketersediaan", ""), key = f"ind_avail_pub{i}_{j}", disabled = not is_editable
+                            sub["publikasi_ketersediaan"] = st.text_input("Publikasi Ketersediaan", value = sub.get("publikasi_ketersediaan", ""), key = f"ind_avail_pub{i}_{j}", disabled = is_editable
                                                                          )
-                        if st.button(f"🗑️ Hapus Indikator Pembangun {j+1}", key=f"remove_build_{i}_{j}", disabled = not is_editable):
+                        if st.button(f"🗑️ Hapus Indikator Pembangun {j+1}", key=f"remove_build_{i}_{j}", disabled = is_editable):
                             remove_sub_index = j
     
                     if remove_sub_index is not None:
@@ -1191,7 +1191,7 @@ with tab2:
             else:
                 st.caption("Jika bukan merupakan indikator komposit, tambahkan satu atau lebih variabel pembangun")
                 with st.popover("Variabel Pembangun"):
-                    if st.button("➕ Tambah Variabel Pembangun", key=f"add_var_build_{i}", disabled = not is_editable):
+                    if st.button("➕ Tambah Variabel Pembangun", key=f"add_var_build_{i}", disabled = is_editable):
                         ind["variabel_pembangun"].append({
                             "nama_variabel_pembangun": "",
                             "kegiatan_penghasil": ""
@@ -1205,29 +1205,29 @@ with tab2:
                             var["nama_variabel_pembangun"] = st.text_input(
                                 "Nama Variabel Pembangun",
                                 value=var.get("nama_variabel_pembangun", ""),
-                                key=f"var_build_name_{i}_{j}", disabled = not is_editable
+                                key=f"var_build_name_{i}_{j}", disabled = is_editable
                             )
                         with col2:
                             var["kegiatan_penghasil"] = st.text_input(
                                 "Kegiatan Penghasil Variabel",
                                 value=var.get("kegiatan_penghasil", ""),
-                                key=f"var_build_source_{i}_{j}", disabled = not is_editable
+                                key=f"var_build_source_{i}_{j}", disabled = is_editable
                             )
         
-                        if st.button(f"🗑️ Hapus Variabel Pembangun {j+1}", key=f"remove_var_{i}_{j}", disabled = not is_editable):
+                        if st.button(f"🗑️ Hapus Variabel Pembangun {j+1}", key=f"remove_var_{i}_{j}", disabled = is_editable):
                             remove_var_index = j
         
                     if remove_var_index is not None:
                         ind["variabel_pembangun"].pop(remove_var_index)
             
             ind["level_estimasi"] = st.text_area(
-                "Level Estimasi", value=ind.get("level_estimasi", ""), key=f"ind_level_estimasi_{i}", disabled = not is_editable
+                "Level Estimasi", value=ind.get("level_estimasi", ""), key=f"ind_level_estimasi_{i}", disabled = is_editable
             )
             ind["indikator_diakses_umum"] = st.checkbox(
-                "Indikator Dapat Diakses Umum", value=ind.get("indikator_diakses_umum", False), key=f"ind_dapat_diakses_umum_{i}", disabled = not is_editable
+                "Indikator Dapat Diakses Umum", value=ind.get("indikator_diakses_umum", False), key=f"ind_dapat_diakses_umum_{i}", disabled = is_editable
             )            
             # Remove variable button
-            if st.button(f"🗑️ Hapus Indikator {i+1}", key=f"remove_ind_{i}", disabled = not is_editable):
+            if st.button(f"🗑️ Hapus Indikator {i+1}", key=f"remove_ind_{i}", disabled = is_editable):
                 remove_ind_index = i
       
             st.divider()
@@ -1251,7 +1251,7 @@ with tab3:
                     alias = st.text_input(
                         "Alias",
                         value=var.get("alias", ""),
-                        key=f"alias_{i}", disabled = not is_editable
+                        key=f"alias_{i}", disabled = is_editable
                     )
                     var["alias"] = alias  # store in session_state
                     
@@ -1262,54 +1262,54 @@ with tab3:
                     referensi_pemilihan = st.text_input(
                         "Referensi Pemilihan",
                         value=var.get("referensi_pemilihan", ""),
-                        key=f"referensi_pemilihan_{i}", disabled = not is_editable
+                        key=f"referensi_pemilihan_{i}", disabled = is_editable
                     )
                     var["referensi_pemilihan"] = referensi_pemilihan  # store in session_state
                     
                     ukuran = st.text_input(
                         "Ukuran",
                         value=var.get("ukuran", ""),
-                        key=f"ukuran_{i}", disabled = not is_editable
+                        key=f"ukuran_{i}", disabled = is_editable
                     )
                     var["ukuran"] = ukuran  # store in session_state
                     
                     satuan = st.text_input(
                         "Satuan",
                         value=var.get("satuan", ""),
-                        key=f"satuan_{i}", disabled = not is_editable
+                        key=f"satuan_{i}", disabled = is_editable
                     )
                     var["satuan"] = satuan  # store in session_state
                 
                     tipe_data = st.text_area(
                         "Tipe Data",
                         value=var.get("tipe_data", ""),
-                        key=f"interpretasi_{i}", disabled = not is_editable
+                        key=f"interpretasi_{i}", disabled = is_editable
                     )
                     var["tipe_data"] = tipe_data  # store in session_state
 
                     isian_klasifikasi = st.text_area(
                         "Isian Klasifikasi",
                         value=var.get("isian_klasifikasi", ""),
-                        key=f"isian_klasifikasi_{i}", disabled = not is_editable
+                        key=f"isian_klasifikasi_{i}", disabled = is_editable
                     )
                     var["isian_klasifikasi"] = isian_klasifikasi
 
                     aturan_validasi = st.text_area(
                         "Aturan Validasi",
                         value=var.get("aturan_validasi", ""),
-                        key=f"aturan_validasi_{i}", disabled = not is_editable
+                        key=f"aturan_validasi_{i}", disabled = is_editable
                     )
                     var["aturan_validasi"] = aturan_validasi
 
                     kalimat_pertanyaan = st.text_area(
                         "Kalimat Pertanyaan",
                         value=var.get("kalimat_perntanyaan", ""),
-                        key=f"kalimat_perntanyaan{i}", disabled = not is_editable
+                        key=f"kalimat_perntanyaan{i}", disabled = is_editable
                     )
                     var["kalimat_perntanyaan"] = kalimat_pertanyaan
                     
                     var["dapat_diakses_umum"] = st.checkbox(
-                "Variabel Dapat Diakses Umum", value=var.get("dapat_diakses_umum", False), key=f"var_dapat_diakses_umum_{i}", disabled = not is_editable)  
+                "Variabel Dapat Diakses Umum", value=var.get("dapat_diakses_umum", False), key=f"var_dapat_diakses_umum_{i}", disabled = is_editable)  
                     
             # st.divider()
     
