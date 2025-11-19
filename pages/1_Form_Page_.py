@@ -40,7 +40,7 @@ def load_form(activity_id, username):
         return None # wajib cocok owner 
 
     owner = row.get("user_id")
-    if role == "owner" and username == owner:
+    if role == "user" and username == owner:
         return row
     
     # Verifier boleh baca & edit revisi
