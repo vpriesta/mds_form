@@ -120,7 +120,12 @@ if not edit_id:
 status = st.session_state.form_data.get("status", "Draft") 
 is_submitted = status == "Submitted" 
 st.write("### 📄 Activity Form") 
-if is_submitted: 
+is_readonly = False
+
+if role == "user" and (status != "Draft" or status != "Revision Requested"):
+    is_readonly = True
+    
+if is_readonly: 
     st.info("This activity has been **submitted** and cannot be edited.") 
 else: 
     st.success("You can edit and save this activity before submission.")
@@ -146,11 +151,6 @@ for sec in sections:
     # kalau belum ada di session_state
     if sec not in st.session_state:
         st.session_state[sec] = st.session_state.form_data[sec]
-
-is_readonly = False
-
-if role == "user" and (status != "draft" or status != "revision_requested"):
-    is_readonly = True
 
 # ===== Page tabs =====
 tab1, tab2, tab3 = st.tabs(["📘 MS Kegiatan", "📊 MS Indikator", "📈 MS Variabel"])
