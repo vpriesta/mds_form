@@ -38,22 +38,44 @@ def load_form(activity_id, username):
     row = get_activity(activity_id) 
     if not row: 
         return None # wajib cocok owner 
-    if row.get("user_id") != username: 
-        return None 
+
+    owner = row.get("user_id")
+    if role == "owner" and username == owner:
+        return row
     
-    return row.get("data", None) 
-        
-def save_form(activity_id, username, data): 
-    """Simpan draft ke Supabase.""" 
-    success, row = upsert_activity(activity_id=activity_id, user_id=username,
-                                   payload=data, status="draft",) 
-    return success 
+    # Verifier boleh baca & edit revisi
+    if role == "verifier":
+        return row
+    
+    # Default (should not happen)
+    return None 
+
+def save_form(activity_id, username, data):
+    row = get_activity(activity_id)
+    if not row:
+        return False
+    
+    owner_id = row.get("user_id")   # ALWAYS USE ORIGINAL OWNER
+
+    success, row = upsert_activity(
+        activity_id=activity_id,
+        user_id=owner_id,     # <-- fixed
+        payload=data,
+        status="draft",
+    )
+    return success
     
 def submit_form(activity_id): 
     """Submit final ke Supabase.""" 
-    return upsert_activity(activity_id=activity_id, user_id=username,
-                           payload=st.session_state.form_data,
-                           status="submitted", )[0]
+    row = get_activity(activity_id)
+    owner_id = row.get("user_id")
+    
+    return upsert_activity(
+        activity_id=activity_id,
+        user_id=owner_id,   # ALWAYS OWNER
+        payload=st.session_state.form_data,
+        status="submitted",
+    )[0]
 
 # ===================================================== 
 # 3️⃣ LOAD STORAGE (EDIT MODE) 
