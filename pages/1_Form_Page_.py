@@ -85,8 +85,13 @@ def submit_form(activity_id):
 # 3️⃣ LOAD STORAGE (EDIT MODE) 
 # ===================================================== 
 edit_id = st.session_state.get("edit_activity_id") 
+is_readonly = False
 if edit_id: 
     supa_data = load_form(edit_id, username, role) 
+    row = get_activity(edit_id) 
+    status = row.get("status")
+    if role == "user" and (status == "submitted" or status == "Verified"):
+        is_readonly = True
     
     if supa_data: 
         st.session_state.current_activity_id = edit_id
@@ -117,18 +122,18 @@ if not edit_id:
 # ===================================================== 
 # 5️⃣ STATUS DISPLAY 
 # ===================================================== 
-# row = get_activity(activity_id) 
-# activities = list_activities_for_user(st.session_state.username)
-# status = st.session_state.form_data.get("status")
-row = get_activity(edit_id) 
-status = row.get("status")
-is_submitted = status == "Submitted" 
+# row = get_activity(edit_id) 
+# status = row.get("status")
+# is_submitted = status == "Submitted" 
+
 st.write("### 📄 Activity Form") 
 st.write(status)
-is_readonly = False
 
-if role == "user" and (status == "submitted" or status == "Verified"):
-    is_readonly = True
+# is_readonly = False
+
+# if role == "user" and (status == "submitted" or status == "Verified"):
+#     if edit_id:
+#         is_readonly = True
     
 if is_readonly: 
     st.info("This activity has been **submitted** and cannot be edited.") 
