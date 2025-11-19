@@ -205,31 +205,31 @@ with tab1:
         )
         st.session_state["halaman_awal"]["sektor"] = sektor
 
-        # submit_halaman_awal = st.form_submit_button("💾 Simpan Halaman Awal", disabled = not is_editable)
+        submit_halaman_awal = st.form_submit_button("💾 Simpan Halaman Awal", disabled = not is_editable)
 
-        # if submit_halaman_awal: 
-        #     new_entry = {
-        #         "halaman_awal" : {
-        #             "jenis_statistik": jenis_statistik,
-        #             "rekomendasi": rekomendasi,
-        #             "rekomendasi_id": rekomendasi_id,
-        #             "judul": judul,
-        #             "tahun": tahun,
-        #             "cara_pengumpulan": cara_pengumpulan,
-        #             "sektor": sektor,
-        #             "status": "Draft",
-        #             "last_saved": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        #         }
-        #     } 
-        #     success = save_form(
-        #         activity_id=st.session_state.current_activity_id, 
-        #         username=username, 
-        #         data=new_entry,) 
+        if submit_halaman_awal: 
+            new_entry = {
+                "halaman_awal" : {
+                    "jenis_statistik": jenis_statistik,
+                    "rekomendasi": rekomendasi,
+                    "rekomendasi_id": rekomendasi_id,
+                    "judul": judul,
+                    "tahun": tahun,
+                    "cara_pengumpulan": cara_pengumpulan,
+                    "sektor": sektor,
+                    "status": "Draft",
+                    "last_saved": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                }
+            } 
+            success = save_form(
+                activity_id=st.session_state.current_activity_id, 
+                username=username, 
+                data=new_entry,) 
             
-        #     if success: 
-        #         st.success("✅ Tersimpan di Supabase!") 
-        #     else: 
-        #         st.error("❌ Gagal menyimpan ke Supabase.")
+            if success: 
+                st.success("✅ Tersimpan di Supabase!") 
+            else: 
+                st.error("❌ Gagal menyimpan ke Supabase.")
     
         # if submit_halaman_awal:            
         #     new_entry = {
