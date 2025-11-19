@@ -120,6 +120,7 @@ if not edit_id:
 status = st.session_state.form_data.get("status", "Draft") 
 is_submitted = status == "Submitted" 
 st.write("### 📄 Activity Form") 
+st.write(status)
 is_readonly = False
 
 if role == "user" and (status == "submitted" or status == "Verified"):
