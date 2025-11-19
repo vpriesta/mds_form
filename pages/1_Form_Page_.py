@@ -156,9 +156,9 @@ if edit_id:
     st.info(f"ℹ️ Catatan Revisi:\n{notes}\n\nTanggal Pemeriksaan: {verif_date}")
 
 if status == "rejected":
-    st.info(f"❌ Alasan Ditolak:\n{rn}\n\nTanggal Ditolak: {reject_date}")
+    st.warning(f"❌ Alasan Ditolak:\n{rn}\n\nTanggal Ditolak: {reject_date}")
 elif status == "accepted":
-    st.info(f"✅ Metadata telah diverifikasi dan diterima\n\nTanggal Diterima: {verified_at}")
+    st.success(f"✅ Metadata telah diverifikasi dan diterima\n\nTanggal Diterima: {verified_at}")
 else:
     None
 
