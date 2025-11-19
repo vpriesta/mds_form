@@ -120,7 +120,7 @@ if not edit_id:
 # row = get_activity(activity_id) 
 # activities = list_activities_for_user(st.session_state.username)
 # status = st.session_state.form_data.get("status")
-row = get_activity(activity_id) 
+row = get_activity(edit_id) 
 status = row.get("status")
 is_submitted = status == "Submitted" 
 st.write("### 📄 Activity Form") 
