@@ -153,7 +153,7 @@ else:
 
 
 if edit_id:
-    st.info(f"ℹ️ Catatan Revisi:\n{notes}\n\nTanggal Pemeriksaan: {verif_date}")
+    st.info(f"ℹ️ Catatan Revisi:\n{notes}\n\nTanggal Pemeriksaan: {datetime.fromisoformat(verif_date).date()}")
 
 if status == "rejected":
     st.warning(f"❌ Alasan Ditolak:\n{rn}\n\nTanggal Ditolak: {reject_date}")
