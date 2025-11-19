@@ -33,22 +33,24 @@ role = st.session_state["role"]
 # ===================================================== 
 # 2️⃣ HELPER LOAD & SAVE SUPABASE 
 # ===================================================== 
-def load_form(activity_id, username): 
+def load_form(activity_id, username, role): 
     """Ambil data dari Supabase.""" 
     row = get_activity(activity_id) 
     if not row: 
         return None # wajib cocok owner 
 
     owner = row.get("user_id")
-    if role == "user" and username == owner:
-        return row
+    if role == "user":
+        if username == owner:
+            return row.get("data", None)
+        return None
     
     # Verifier boleh baca & edit revisi
     if role == "verifier":
-        return row
+        return row.get("data", None)
     
     # Default (should not happen)
-    return None 
+    return None
 
 def save_form(activity_id, username, data):
     row = get_activity(activity_id)
