@@ -152,7 +152,7 @@ else:
     st.success("You can edit and save this activity before submission.")
 
 
-if edit_id and notes not None:
+if edit_id and notes:
     st.info(f"ℹ️ Catatan Revisi:\n{notes}\n\nTanggal Pemeriksaan: {datetime.fromisoformat(verif_date).date().strftime("%d %B %Y")}")
 
 if status == "rejected":
