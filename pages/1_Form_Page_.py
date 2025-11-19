@@ -113,6 +113,7 @@ if not edit_id:
     if not st.session_state.current_activity_id: 
         new_id = str(uuid.uuid4()) 
         st.session_state.current_activity_id = new_id
+        notes = ""
         save_form(new_id, username, {})
         st.session_state.form_data = {
             "activity_id": new_id,
