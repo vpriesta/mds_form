@@ -99,6 +99,7 @@ if edit_id:
     verif_date = row.get("data").get("revision_requested_at")
     rn = row.get("data").get("reject_note")
     reject_date = row.get("data").get("rejected_at")
+    verified_at = row.get("data").get("verified_at")
     if role == "user" and (status == "submitted" or status == "Verified" or status == "rejected"):
         is_readonly = True
     
