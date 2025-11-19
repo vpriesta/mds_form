@@ -95,6 +95,7 @@ if edit_id:
     supa_data = load_form(edit_id, username, role) 
     row = get_activity(edit_id) 
     status = row.get("status")
+    notes = row.get("data").get("revision_note")
     if role == "user" and (status == "submitted" or status == "Verified"):
         is_readonly = True
     
@@ -128,8 +129,8 @@ if not edit_id:
 # ===================================================== 
 # 5️⃣ STATUS DISPLAY 
 # ===================================================== 
-row = get_activity(edit_id)
-notes = row.get("revision_note")
+# row = get_activity(edit_id)
+# notes = row.get("revision_note")
 # status = row.get("status")
 # is_submitted = status == "Submitted" 
 
