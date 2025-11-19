@@ -129,7 +129,7 @@ if not edit_id:
 # 5️⃣ STATUS DISPLAY 
 # ===================================================== 
 row = get_activity(edit_id)
-notes = row.get("revision_note"]
+notes = row.get("revision_note")
 # status = row.get("status")
 # is_submitted = status == "Submitted" 
 
