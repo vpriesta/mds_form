@@ -57,10 +57,15 @@ def load_form(activity_id, username, role):
 def save_form(activity_id, username, data):
     row = get_activity(activity_id)
     if not row:
-        return False
+        success, row = upsert_activity(
+            activity_id=activity_id,
+            user_id=username,
+            payload=data,
+            status="draft"
+        )
+        return success
     
     owner_id = row.get("user_id")   # ALWAYS USE ORIGINAL OWNER
-
     success, row = upsert_activity(
         activity_id=activity_id,
         user_id=owner_id,     # <-- fixed
@@ -107,6 +112,7 @@ if not edit_id:
     if not st.session_state.current_activity_id: 
         new_id = str(uuid.uuid4()) 
         st.session_state.current_activity_id = new_id
+        save_form(new_id, username, {})
         st.session_state.form_data = {
             "activity_id": new_id,
             "owner": username,
