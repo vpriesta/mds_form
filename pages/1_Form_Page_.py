@@ -84,7 +84,7 @@ def submit_form(activity_id):
 # ===================================================== 
 edit_id = st.session_state.get("edit_activity_id") 
 if edit_id: 
-    supa_data = load_form(edit_id, username) 
+    supa_data = load_form(edit_id, username, role) 
     
     if supa_data: 
         st.session_state.current_activity_id = edit_id
