@@ -90,7 +90,7 @@ if edit_id:
         st.session_state.current_activity_id = edit_id
         st.session_state.form_data = supa_data.copy() 
     else: 
-        st.warning("⚠️ Data di Supabase tidak ditemukan. Membuat draft baru.")
+        st.warning("⚠️ Data tidak ditemukan. Membuat draft baru.")
         edit_id = None
 
 # ===================================================== 
