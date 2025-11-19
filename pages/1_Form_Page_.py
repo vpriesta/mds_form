@@ -128,12 +128,13 @@ if not edit_id:
 # ===================================================== 
 # 5️⃣ STATUS DISPLAY 
 # ===================================================== 
-# row = get_activity(edit_id) 
+row = get_activity(edit_id)
+notes = row.get("revision_note"]
 # status = row.get("status")
 # is_submitted = status == "Submitted" 
 
 st.write("### 📄 Activity Form") 
-st.write(st.session_state.form_data.get("status"))
+st.write(f"Catatan Revisi: {notes}")
 
 # is_readonly = False
 
