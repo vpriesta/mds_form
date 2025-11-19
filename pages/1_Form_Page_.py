@@ -118,7 +118,7 @@ if not edit_id:
 # 5️⃣ STATUS DISPLAY 
 # ===================================================== 
 # row = get_activity(activity_id) 
-status = st.session_state.get("status") 
+status = st.session_state.form_data.get("status", "Draft") 
 is_submitted = status == "Submitted" 
 st.write("### 📄 Activity Form") 
 st.write(status)
