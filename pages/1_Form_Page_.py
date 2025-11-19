@@ -37,10 +37,6 @@ def load_form(activity_id, username, role):
     """Ambil data dari Supabase.""" 
     row = get_activity(activity_id) 
     status = row.get("status") if row else "draft"
-    is_readonly = False
-
-    if role == "user" and (status != "draft" or status != "revision_requested"):
-        is_readonly = True
     
     if not row: 
         return None # wajib cocok owner 
@@ -151,7 +147,10 @@ for sec in sections:
     if sec not in st.session_state:
         st.session_state[sec] = st.session_state.form_data[sec]
 
-is_editable = (status == "Submitted" or status == "Verified" or status == "Rejected")
+is_readonly = False
+
+if role == "user" and (status != "draft" or status != "revision_requested"):
+    is_readonly = True
 
 # ===== Page tabs =====
 tab1, tab2, tab3 = st.tabs(["📘 MS Kegiatan", "📊 MS Indikator", "📈 MS Variabel"])
