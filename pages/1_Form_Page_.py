@@ -96,7 +96,10 @@ if edit_id:
     row = get_activity(edit_id) 
     status = row.get("status")
     notes = row.get("data").get("revision_note")
-    if role == "user" and (status == "submitted" or status == "Verified"):
+    verif_date = row.get("data").get("revision_requested_at")
+    rn = row.get("data").get("reject_note")
+    reject_date = row.get("data").get("rejected_at")
+    if role == "user" and (status == "submitted" or status == "Verified" or status == "rejected"):
         is_readonly = True
     
     if supa_data: 
@@ -113,7 +116,6 @@ if not edit_id:
     if not st.session_state.current_activity_id: 
         new_id = str(uuid.uuid4()) 
         st.session_state.current_activity_id = new_id
-        notes = ""
         save_form(new_id, username, {})
         st.session_state.form_data = {
             "activity_id": new_id,
@@ -148,8 +150,14 @@ if is_readonly:
 else: 
     st.success("You can edit and save this activity before submission.")
 
+
 if edit_id:
-    st.info(f"ℹ️ Catatan Revisi:\n\n{notes}")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.info(f"ℹ️ Catatan Revisi:\n{notes}\n\nTanggal Pemeriksaan: {verif_date}")
+
+    with col2:
+        st.info(f"❌ Alasan Ditolak:\n{rn}\n\nTanggal Ditolak: {reject_date}")
 
 # =====================================================
 # 6️⃣ ALWAYS GUARANTEE FORM STRUCTURE (FIXED VERSION)
