@@ -100,7 +100,7 @@ if edit_id:
     rn = row.get("data").get("reject_note")
     reject_date = row.get("data").get("rejected_at")
     verified_at = row.get("data").get("verified_at")
-    if role == "user" and (status == "submitted" or status == "Verified" or status == "rejected"):
+    if role == "user" and (status == "submitted" or status == "verified" or status == "rejected"):
         is_readonly = True
     
     if supa_data: 
@@ -157,7 +157,7 @@ if edit_id and notes:
 
 if status == "rejected":
     st.warning(f"❌ Alasan Ditolak:\n{rn}\n\nTanggal Ditolak: {datetime.fromisoformat(reject_date).date().strftime("%d %B %Y")}")
-elif status == "accepted":
+elif status == "verified":
     st.success(f"✅ Metadata telah diverifikasi dan diterima\n\nTanggal Diterima: {datetime.fromisoformat(verified_at).date().strftime("%d %B %Y")}")
 
 # =====================================================
