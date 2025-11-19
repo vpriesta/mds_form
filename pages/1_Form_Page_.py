@@ -122,7 +122,7 @@ is_submitted = status == "Submitted"
 st.write("### 📄 Activity Form") 
 is_readonly = False
 
-if role == "user" and (status == "Submitted" or status == "Verified"):
+if role == "user" and (status == "submitted" or status == "Verified"):
     is_readonly = True
     
 if is_readonly: 
