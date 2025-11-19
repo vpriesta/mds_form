@@ -11,7 +11,7 @@ st.set_page_config(page_title="Formulir MS Kegiatan", page_icon="📝", layout="
 # 0️⃣ AUTH CHECK
 # =====================================================
 if "authenticated" not in st.session_state or not st.session_state.authenticated:
-    st.warning("⚠️ Please log in first.")
+    st.warning("⚠️ Silahkan login untuk mengakses form.")
     st.stop()
 
 if st.sidebar.button("🚪 Logout"):
