@@ -127,7 +127,7 @@ if not edit_id:
 # is_submitted = status == "Submitted" 
 
 st.write("### 📄 Activity Form") 
-st.write(status)
+st.write(st.session_state.form_data.get("status"))
 
 # is_readonly = False
 
