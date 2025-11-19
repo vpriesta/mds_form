@@ -78,7 +78,7 @@ def edit_value(value, key_path):
 # DISPLAY EACH SUBMITTED ACTIVITY
 # =====================================================
 for idx, act in enumerate(submitted):
-    activity_id = act.get("id")
+    activity_id = act.get("activity_id")
     data = act.get("data", {})
 
     title = data.get("halaman_awal", {}).get("judul", f"Untitled {idx}")
