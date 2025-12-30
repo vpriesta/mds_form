@@ -37,6 +37,7 @@ if not st.session_state.authenticated:
         if username_input in users and users[username_input] == hash_password(password_input):
             st.session_state.authenticated = True
             st.session_state.username = username_input
+            st.session_state.user_id = st.session_state.username
             st.session_state.role = roles.get(username_input, "user")
             st.success(f"Welcome back, {username_input}!")
             st.rerun()
