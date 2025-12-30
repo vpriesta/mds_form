@@ -135,64 +135,69 @@ def list_all_activities():
     ws = get_worksheet()
     rows = ws.get_all_values()
 
+    if not rows:
+        return []
+
     header = rows[0]
     data_rows = rows[1:]
 
     out = []
     for r in data_rows:
         row = dict(zip(header, r))
-        row["data"] = json.loads(row["data"]) if row.get("data") else {}
+
+        try:
+            row["data"] = json.loads(row["data"]) if row.get("data") else {}
+        except json.JSONDecodeError:
+            logger.error(
+                f"Invalid JSON in activity_id={row.get('activity_id')}"
+            )
+            row["data"] = {}  # or continue to skip
+
         out.append(row)
 
     return out
 
 
-
 def list_activities_for_user(user_id: str, status: Optional[str] = None, limit: int = 200):
-    try:
-        ws = get_worksheet()
-        records = _get_all_rows(ws)
+    ws = get_worksheet()
+    records = _get_all_rows(ws)
 
-        out = []
-        for r in records:
-            if str(r.get("user_id", "")).strip() != str(user_id).strip():
-                continue
+    out = []
+    for r in records:
+        if r["user_id"] != user_id:
+            continue
+        if status and r["status"] != status:
+            continue
 
-            if status and str(r.get("status", "")).strip().lower() != status.lower():
-                continue
+        try:
+            r["data"] = json.loads(r["data"]) if r.get("data") else {}
+        except json.JSONDecodeError:
+            logger.error(f"Invalid JSON in row activity_id={r.get('activity_id')}")
+            r["data"] = {}  # or skip row
 
-            row = dict(r)  # 🔑 copy, don’t mutate original
-            row["data"] = json.loads(row["data"]) if row.get("data") else {}
+        out.append(r)
 
-            out.append(row)
-
-        return out[:limit]
-
-    except Exception:
-        logger.exception("list_activities_for_user failed")
-        return []
+    return out[:limit]
 
 
 def list_submitted_activities(limit: int = 500):
-    try:
-        ws = get_worksheet()
-        records = _get_all_rows(ws)
+    ws = get_worksheet()
+    records = _get_all_rows(ws)
 
-        out = []
-        for r in records:
-            if str(r.get("status", "")).strip().lower() != "submitted":
-                continue
+    out = []
+    for r in records:
+        if r["status"] != "submitted":
+            continue
 
-            row = dict(r)  # 🔑 copy
-            row["data"] = json.loads(row["data"]) if row.get("data") else {}
+        try:
+            r["data"] = json.loads(r["data"]) if r.get("data") else {}
+        except json.JSONDecodeError:
+            logger.error(f"Invalid JSON in row activity_id={r.get('activity_id')}")
+            r["data"] = {}
 
-            out.append(row)
+        out.append(r)
 
-        return out[:limit]
-
-    except Exception:
-        logger.exception("list_submitted_activities failed")
-        return []
+    return out[:limit]
 
 
 def mark_status(activity_id: str, status: str, verifier: Optional[str] = None, comment: Optional[str] = None) -> bool:
