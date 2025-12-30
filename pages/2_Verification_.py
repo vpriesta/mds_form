@@ -1,6 +1,6 @@
 import streamlit as st
 from datetime import datetime
-from supabase_client import (
+from gsheet_client import (
     list_submitted_activities,
     mark_status,
     get_activity,
