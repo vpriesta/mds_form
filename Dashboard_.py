@@ -62,7 +62,7 @@ st.set_page_config(page_title="Activity Dashboard", page_icon="📋", layout="wi
 if st.session_state.role == "verifier":
     activities = list_all_activities()
 else:
-    activities = list_activities_for_user(st.session_state.username)
+    activities = list_activities_for_user(st.session_state.user_id)
 
 # st.write("DEBUG - Raw activities from Supabase:", activities)
 
