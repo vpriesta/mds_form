@@ -38,18 +38,6 @@ def get_worksheet():
 
     sheet = client.open(SHEET_NAME)
     ws = sheet.worksheet(WORKSHEET_NAME)
-
-    EXPECTED_HEADERS = ["activity_id", "user_id", "status", "data", "updated_at"]
-    headers = ws.row_values(1)
-
-    if headers != EXPECTED_HEADERS:
-        if not headers:
-            ws.append_row(EXPECTED_HEADERS)
-        else:
-            raise RuntimeError(
-                f"Invalid sheet header.\nExpected: {EXPECTED_HEADERS}\nFound: {headers}"
-            )
-
     return ws
 
 def _get_all_rows(ws):
