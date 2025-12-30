@@ -59,7 +59,7 @@ st.set_page_config(page_title="Activity Dashboard", page_icon="📋", layout="wi
 # For non-verifier: list user's own activities
 # For verifier: show submitted activities (you can change to show all if you add list_all in supabase_client)
 if st.session_state.role != "verifier":
-    activities = list_activities_for_user(st.session_state.username)
+    activities = list_activities_for_user(st.session_state.user_id)
 else:
     # Verifier sees ALL activities
     activities = list_all_activities()
