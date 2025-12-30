@@ -1,9 +1,7 @@
 import streamlit as st
-# import json
-# from pathlib import Path
 from datetime import datetime
 import uuid
-from supabase_client import (get_activity, upsert_activity, mark_status)
+from gsheet_client import (get_activity, upsert_activity, mark_status)
 
 st.set_page_config(page_title="Formulir MS Kegiatan", page_icon="📝", layout="wide")
 
@@ -31,10 +29,10 @@ username = st.session_state["username"]
 role = st.session_state["role"]
 
 # ===================================================== 
-# 2️⃣ HELPER LOAD & SAVE SUPABASE 
+# 2️⃣ HELPER LOAD & SAVE
 # ===================================================== 
 def load_form(activity_id, username, role): 
-    """Ambil data dari Supabase.""" 
+    """Ambil data dari temporary base.""" 
     row = get_activity(activity_id) 
     status = row.get("status") if row else "draft"
     
@@ -75,7 +73,7 @@ def save_form(activity_id, username, data):
     return success
     
 def submit_form(activity_id): 
-    """Submit final ke Supabase.""" 
+    """Submit final ke temporary table.""" 
     row = get_activity(activity_id)
     owner_id = row.get("user_id")
     
@@ -130,21 +128,7 @@ if not edit_id:
             "verifier_comment": "",
         }
 
-# ===================================================== 
-# 5️⃣ STATUS DISPLAY 
-# ===================================================== 
-# row = get_activity(edit_id)
-# notes = row.get("revision_note")
-# status = row.get("status")
-# is_submitted = status == "Submitted" 
-
 st.write("### 📄 Activity Form")
-
-# is_readonly = False
-
-# if role == "user" and (status == "submitted" or status == "Verified"):
-#     if edit_id:
-#         is_readonly = True
     
 if is_readonly: 
     st.info(f"This activity has been **{status}** and cannot be edited.") 
@@ -286,49 +270,10 @@ with tab1:
                 data=new_entry,) 
             
             if success: 
-                st.success("✅ Tersimpan di Supabase!") 
+                st.success("✅ Tersimpan!") 
             else: 
-                st.error("❌ Gagal menyimpan ke Supabase.")
+                st.error("❌ Gagal menyimpan")
     
-        # if submit_halaman_awal:            
-        #     new_entry = {
-        #         "halaman_awal" : {
-        #             "jenis_statistik": jenis_statistik,
-        #             "rekomendasi": rekomendasi,
-        #             "rekomendasi_id": rekomendasi_id,
-        #             "judul": judul,
-        #             "tahun": tahun,
-        #             "cara_pengumpulan": cara_pengumpulan,
-        #             "sektor": sektor,
-        #             "status": "Draft",
-        #             "last_saved": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        #         }
-        #     }
-            
-        #     if data_path.exists():
-        #         try:
-        #             form_list = json.loads(data_path.read_text())
-        #             if not isinstance(form_list, list):
-        #                 form_list = []
-        #         except json.JSONDecodeError:
-        #             form_list = []
-        #     else:
-        #         form_list = []
-            
-        #     # Determine whether editing an existing activity
-        #     if st.session_state.get("edit_index") is not None:
-        #         form_list[st.session_state.edit_index] = new_entry
-        #     else:
-        #         form_list.append(new_entry)
-            
-        #     # Save back to file
-        #     data_path.write_text(json.dumps(form_list, indent=2, ensure_ascii=False, default=str))
-            
-        #     # st.success("✅ Semua progress disimpan ke file JSON!")
-        #     # st.session_state["submit_halaman_awal"] = new_entry
-        #     st.success("Halaman Awal disimpan!")
-
-    # st.divider()
 
     if "blok_1_3" not in st.session_state:
             st.session_state["blok_1_3"] = {}
@@ -505,46 +450,6 @@ with tab1:
         if remove_var_index is not None:
             st.session_state.variables.pop(remove_var_index)
             st.rerun()
-        
-        # Optional: Submit all variables
-    #     if st.button("💾 Simpan Semua Variabel"):
-    #         st.write("Variabel tersimpan:")
-    #         st.json(st.session_state.variables)
-
-    # # ===== Save form button =====
-    #     submit_1_3 = st.button("💾 Simpan Blok 1 - 3")
-
-    #     if submit_1_3:            
-    #         new_entry = {
-    #             "i_instansi_penyelenggara": instansi_default["i_instansi_penyelenggara"],
-    #             "i_alamat": instansi_default["i_alamat"],
-    #             "i_telepon": instansi_default["i_telepon"],
-    #             "i_faksimile": instansi_default["i_faksimile"],
-    #             "i_email": instansi_default["i_email"],
-    #             "ii_unit_eselon1": ii_unit_eselon1,
-    #             "ii_unit_eselon2": ii_unit_eselon2,
-    #             "ii_pj_nama": ii_pj_nama,
-    #             "ii_pj_jabatan": ii_pj_jabatan,
-    #             "ii_pj_alamat": ii_pj_alamat,
-    #             "ii_pj_telepon": ii_pj_telepon,
-    #             "ii_pj_email": ii_pj_email,
-    #             "ii_pj_faksimile": ii_pj_faksimile,
-    #             "iii_latar_belakang_kegiatan": iii_latar_belakang_kegiatan,
-    #             "iii_tujuan_kegiatan": iii_tujuan_kegiatan,
-    #             "iii_jadwal_perencanaan_kegiatan": save_date("iii_jadwal_perencanaan_kegiatan_start", "iii_jadwal_perencanaan_kegiatan_end"),
-    #             "iii_jadwal_desain" : save_date("iii_jadwal_desain_start", "iii_jadwal_desain_end"),
-    #             "iii_jadwal_pengumpulan_data" : save_date("iii_jadwal_pengumpulan_data_start", "iii_jadwal_pengumpulan_data_end"),
-    #             "iii_jadwal_pengolahan_data" : save_date("iii_jadwal_pengolahan_data_start", "iii_jadwal_pengolahan_data_end"),
-    #             "iii_jadwal_analisis" : save_date("iii_jadwal_analisis_start", "iii_jadwal_analisis_end"),
-    #             "iii_jadwal_diseminasi_hasil" : save_date("iii_jadwal_diseminasi_hasil_start", "iii_jadwal_diseminasi_hasil_end"),
-    #             "iii_jadwal_evaluasi" : save_date("iii_jadwal_evaluasi_start", "iii_jadwal_evaluasi_end"),
-    #             "status": "Draft",
-    #             "last_saved": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    #         }
-    #         st.session_state["blok_1_3"] = new_entry
-    #         st.success("Blok 1 - 3 disimpan!")
-
-    # st.divider()
     
     if "blok_4" not in st.session_state:
             st.session_state["blok_4"] = {}
@@ -702,29 +607,6 @@ with tab1:
 
         st.session_state["blok_4"]["iv_unit_pengumpulan_data"] = iv_unit_pengumpulan_data
 
-        # submit_4 = st.button("💾 Simpan Blok 4")
-    
-        # if submit_4:            
-        #     new_entry = {
-        #         "iv_kegiatan_ini_dilakukan": iv_kegiatan_ini_dilakukan,
-        #         "iv_frekuensi_penyelenggaraan": iv_frekuensi_penyelenggaraan,
-        #         "iv_tipe_pengumpulan_data": iv_tipe_pengumpulan_data,
-        #         "iv_cakupan_wilayah_pengumpulan_data": iv_cakupan_wilayah_pengumpulan_data,
-        #         "iv_sebagian_cakupan_wilayah_pengumpulan_data": iv_sebagian_cakupan_wilayah_pengumpulan_data,
-        #         "metode_utama": metode_utama,
-        #         "iv_metode_pengumpulan_data": iv_metode_pengumpulan_data,
-        #         "sarana_utama": sarana_utama,
-        #         "iv_sarana_pengumpulan_data": iv_sarana_pengumpulan_data,
-        #         "unit_utama": unit_utama,
-        #         "iv_unit_pengumpulan_data": iv_unit_pengumpulan_data,
-        #         "status": "Draft",
-        #         "last_saved": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        #     }
-        #     st.session_state["blok_4"] = new_entry
-        #     st.success("Blok 4 disimpan!")
-
-    # st.divider()
-
     if "blok5" not in st.session_state:
         st.session_state["blok5"] = {}
     
@@ -837,24 +719,6 @@ with tab1:
                                          placeholder = "Tuliskan unit observasi", key="v_unit_observasi", disabled = is_readonly)
             st.session_state["blok_5"]["v_unit_observasi"] = v_unit_observasi
     
-                
-        
-            # Save Block 5
-            # if st.button("💾 Simpan Blok 5"):
-            #     st.session_state["blok_5"] = {
-            #         "v_jenis_rancangan_sampel": v_jenis_rancangan_sampel,
-            #         "sampel_prob": sampel_prob,
-            #         "sampel_nonprob": sampel_nonprob,
-            #         "v_metode_pemilihan_sampel_tahap_terakhir": sampel_prob or sampel_nonprob,
-            #         "v_kerangka_sampel_tahap_akhir": v_kerangka_sampel_tahap_akhir,
-            #         "v_metode_yang_digunakan": v_metode_yang_digunakan,
-            #         "v_fraksi_sampel_keseluruhan": v_fraksi_sampel_keseluruhan,
-            #         "v_nilai_perkiraan_sampling_error_variabel_utama": v_nilai_perkiraan_sampling_error_variabel_utama,
-            #         "v_unit_sampel": v_unit_sampel,
-            #         "v_unit_observasi": v_unit_observasi,
-            #         "last_saved": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            #     }
-            #     st.success("Blok 5 disimpan!")
     else:
         st.info("➡️ Karena cara pengumpulan bukan 'Survei', BLOK 5 dilewati. Silakan lanjut ke BLOK 6.")
 
@@ -1067,8 +931,6 @@ with tab1:
                 vii_tingkat_penyajian_hasil_analisis.remove("Lainnya")
 
         st.session_state["blok_6_8"]["vii_tingkat_penyajian_hasil_analisis"] = vii_tingkat_penyajian_hasil_analisis
-  
-    # st.divider()
     
     with st.expander("📘 BLOK 8 – DISEMINASI HASIL", expanded=False):
 
@@ -1097,36 +959,6 @@ with tab1:
         if viii_ketersediaan_produk_mikrodata:
             viii_rencana_jadwal_rilis_produk_mikrodata= st.date_input("8.2 Rencana Rilis Produk Kegiatan", value=st.session_state["blok_6_8"].get("viii_rencana_jadwal_rilis_produk_mikrodata", None), key="viii_rencana_jadwal_rilis_produk_mikrodata", disabled = is_readonly)
             st.session_state["blok_6_8"]["viii_rencana_jadwal_rilis_produk_mikrodata"] = viii_rencana_jadwal_rilis_produk_mikrodata
-
-        # if st.button("💾 Simpan Blok 6 - 8"):
-        #         st.session_state["blok_6_8"] = {
-        #             "vi_apakah_melakukan_uji_coba": vi_apakah_melakukan_uji_coba,
-        #             "qc_utama": qc_utama,
-        #             "qc_lain": qc_lain,
-        #             "vi_metode_pemeriksaan_kualitas_pengumpulan_data": qc_utama.append(f"Lainnya: {qc_lain}"),
-        #             "vi_apakah_melakukan_penyesuaian_nonrespon": vi_apakah_melakukan_penyesuaian_nonrespon,
-        #             "vi_petugas_pengumpulan_data": vi_petugas_pengumpulan_data,
-        #             "vi_persyaratan_pendidikan_terendah_petugas_pengumpulan_data": vi_persyaratan_pendidikan_terendah_petugas_pengumpulan_data,
-        #             "vi_jumlah_petugas_supervisor": vi_jumlah_petugas_supervisor,
-        #             "vi_jumlah_petugas_enumerator": vi_jumlah_petugas_enumerator,
-        #             "vi_apakah_melakukan_pelatihan_petugas": vi_apakah_melakukan_pelatihan_petugas,
-        #             "vii_tahapan_pengolahan_data": tahapan_list,
-        #             "vii_metode_analisis": vii_metode_analisis,
-        #             "unit_analisis_utama": unit_analisis_utama,
-        #             "unit_analisis_lain": unit_analisis_lain,
-        #             "vii_unit_analisis": unit_analisis_utama.append(f"Lainnya: {unit_analisis_lain}"),
-        #             "vii_tingkat_penyajian_hasil_analisis": penyajian_utama.append(f"Lainnya: {penyajian_lain}"),
-        #             "viii_ketersediaan_produk_tercetak": viii_ketersediaan_produk_tercetak,
-        #             "viii_ketersediaan_produk_digital": viii_ketersediaan_produk_digital,
-        #             "viii_ketersediaan_produk_mikrodata": viii_ketersediaan_produk_mikrodata,
-        #             "viii_rencana_jadwal_rilis_produk_tercetak": viii_rencana_jadwal_rilis_produk_tercetak,
-        #             "viii_rencana_jadwal_rilis_produk_digital": viii_rencana_jadwal_rilis_produk_digital,
-        #             "viii_rencana_jadwal_rilis_produk_mikrodata": viii_rencana_jadwal_rilis_produk_mikrodata,
-        #             "last_saved": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        #         }
-        #         st.success("Blok 6 - 8 disimpan!")
-    
-    # st.divider()
 
 with tab2:
     st.header("📊 MS Indikator")
@@ -1270,11 +1102,6 @@ with tab2:
     # Actually remove the indicators after the loop
     if remove_ind_index is not None:
         st.session_state.indicators.pop(remove_ind_index)
-    
-    # Optional: Submit all variables
-    # if st.button("💾 Simpan Semua Indikator"):
-        # st.write("Indikator tersimpan:")
-        # st.json(st.session_state.indicators)
 
 with tab3:
     st.header("📈 MS Variabel")
@@ -1345,13 +1172,6 @@ with tab3:
                     
                     var["dapat_diakses_umum"] = st.checkbox(
                 "Variabel Dapat Diakses Umum", value=var.get("dapat_diakses_umum", False), key=f"var_dapat_diakses_umum_{i}", disabled = is_readonly)  
-                    
-            # st.divider()
-    
-        # Optional: show updated full structure
-        # if st.button("💾 Simpan Lengkap"):
-        #     st.success("Semua variabel dan informasi tambahan tersimpan!")
-        #     st.json(st.session_state.variables)
     
     else:
         st.info("Belum ada variabel yang terdeteksi pada MS Kegiatan. Input daftar variabel pada MS Kegiatan BLOK 3")
@@ -1385,16 +1205,16 @@ if st.button("💾 Simpan Semua Progress", disabled = is_readonly):
         data=combined_entry,) 
     
     if success: 
-        st.success("✅ Tersimpan di Supabase!") 
+        st.success("✅ Tersimpan!") 
     else: 
-        st.error("❌ Gagal menyimpan ke Supabase.")
+        st.error("❌ Gagal menyimpan")
 
 
 if st.button("📤 Submit", disabled = is_readonly): 
     ok = submit_form(st.session_state.current_activity_id) 
     if ok: 
         st.session_state.form_data["status"] = "Submitted" 
-        st.success("🎉 Submitted ke Supabase!") 
+        st.success("🎉 Submitted!") 
         st.rerun() 
     else: 
         st.error("❌ Submit gagal.")
