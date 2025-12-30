@@ -30,9 +30,7 @@ SHEET_NAME = "MS Form Temp Table"      # Google Sheet file name
 WORKSHEET_NAME = "Sheet1"        # Tab name
 
 
-@st.cache_resource
-
-@st.cache_resource
+# @st.cache_resource
 def get_worksheet():
     creds_dict = st.secrets["gcp_service_account"]
     creds = Credentials.from_service_account_info(creds_dict, scopes=SCOPES)
