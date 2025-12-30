@@ -1,3 +1,5 @@
 streamlit
 supabase
+gspread
+google-auth
 python-dotenv
