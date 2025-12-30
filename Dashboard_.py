@@ -5,9 +5,9 @@ from datetime import datetime
 
 # Supabase client helpers (from your supabase_client.py)
 
-from supabase_client import (
+from gsheet_client import (
     list_activities_for_user,
-    list_submitted_activities,
+    list_all_activities,
     delete_activity,
 )
 
@@ -62,7 +62,6 @@ if st.session_state.role != "verifier":
     activities = list_activities_for_user(st.session_state.username)
 else:
     # Verifier sees ALL activities
-    from supabase_client import list_all_activities
     activities = list_all_activities()
 
 # st.write("DEBUG - Raw activities from Supabase:", activities)
