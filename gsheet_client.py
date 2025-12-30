@@ -45,12 +45,10 @@ def _get_all_rows(ws):
     if len(rows) < 2:
         return []
 
-    headers = rows[0]
-    return [
-        dict(zip(headers, r))
-        for r in rows[1:]
-        if any(r)
-    ]
+    header = [h.strip() for h in rows[0]]
+    data_rows = rows[1:]
+
+    return [dict(zip(header, r)) for r in data_rows]
 
 # -------------------------------------------------
 # Helpers
@@ -133,19 +131,21 @@ def get_activity(activity_id: str) -> Optional[Dict]:
         return None
 
 
-def list_all_activities() -> List[Dict]:
-    try:
-        ws = get_worksheet()
-        records = _get_all_rows(ws)
+def list_all_activities():
+    ws = get_worksheet()
+    rows = ws.get_all_values()
 
-        for r in records:
-            r["data"] = json.loads(r["data"]) if r.get("data") else {}
+    header = rows[0]
+    data_rows = rows[1:]
 
-        return records
+    out = []
+    for r in data_rows:
+        row = dict(zip(header, r))
+        row["data"] = json.loads(row["data"]) if row.get("data") else {}
+        out.append(row)
 
-    except Exception:
-        logger.exception("list_all_activities failed")
-        return []
+    return out
+
 
 
 def list_activities_for_user(user_id: str, status: Optional[str] = None, limit: int = 200):
@@ -155,13 +155,16 @@ def list_activities_for_user(user_id: str, status: Optional[str] = None, limit: 
 
         out = []
         for r in records:
-            if r["user_id"] != user_id:
-                continue
-            if status and r["status"] != status:
+            if str(r.get("user_id", "")).strip() != str(user_id).strip():
                 continue
 
-            r["data"] = json.loads(r["data"]) if r.get("data") else {}
-            out.append(r)
+            if status and str(r.get("status", "")).strip().lower() != status.lower():
+                continue
+
+            row = dict(r)  # 🔑 copy, don’t mutate original
+            row["data"] = json.loads(row["data"]) if row.get("data") else {}
+
+            out.append(row)
 
         return out[:limit]
 
@@ -177,9 +180,13 @@ def list_submitted_activities(limit: int = 500):
 
         out = []
         for r in records:
-            if r["status"] == "submitted":
-                r["data"] = json.loads(r["data"]) if r.get("data") else {}
-                out.append(r)
+            if str(r.get("status", "")).strip().lower() != "submitted":
+                continue
+
+            row = dict(r)  # 🔑 copy
+            row["data"] = json.loads(row["data"]) if row.get("data") else {}
+
+            out.append(row)
 
         return out[:limit]
 
