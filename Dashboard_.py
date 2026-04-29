@@ -11,29 +11,6 @@ from gsheet_client import (
     delete_activity,
 )
 
-from pages import 1_Form_Page_, 2_Verification_
-
-if "page" not in st.session_state:
-    st.session_state["page"] = "dashboard"
-
-# ROUTING
-if st.session_state["page"] == "dashboard":
-    st.title("📊 Dashboard")
-
-    if st.button("➕ Buat Activity"):
-        st.session_state["page"] = "form"
-        st.rerun()
-
-    if st.button("✅ Verifikasi"):
-        st.session_state["page"] = "verification"
-        st.rerun()
-
-elif st.session_state["page"] == "form":
-    form_page.show()
-
-elif st.session_state["page"] == "verification":
-    verification.show()
-
 # --- Function to hash passwords (kept as-is) ---
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
