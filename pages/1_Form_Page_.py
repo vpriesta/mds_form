@@ -377,7 +377,7 @@ with tab1:
             start_date = start.strftime("%d %B %Y") if start else ""
             end = st.session_state["blok_1_3"].get(end_key)
             end_date = end.strftime("%d %B %Y") if end else ""
-            date_range = start_date + str(" hingga ") + end_date
+            date_range = str("Awal: ") + start_date + str(", Akhir: ") + end_date
             return date_range
     
         st.markdown("##### A. Perencanaan", unsafe_allow_html=True)
