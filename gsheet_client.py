@@ -27,7 +27,7 @@ SCOPES = [
 ]
 
 SHEET_NAME = "MS Form Temp Table"      # Google Sheet file name
-WORKSHEET_NAME = "Prod"        # Tab name
+WORKSHEET_NAME = "Dev"        # Tab name
 
 
 # @st.cache_resource
@@ -240,4 +240,3 @@ def submit_activity(activity_id: str, user_id: str) -> bool:
 
 def mark_verified(activity_id: str, verifier: str, comment: Optional[str] = None) -> bool:
     return mark_status(activity_id, "verified")
-
