@@ -20,7 +20,7 @@ if st.sidebar.button("🚪 Logout"):
     for key in list(st.session_state.keys()):
         del st.session_state[key]
     st.rerun()
-
+    
 # =====================================================
 # 1️⃣ DEFAULT STATE SETUP
 # =====================================================
@@ -97,9 +97,8 @@ if edit_id:
     supa_data = load_form(edit_id, username, role) 
     row = get_activity(edit_id) 
     status = row.get("status")
-    notes = row.get("data").get("revision_note")
+    notes = row.get("data").get("verifier_comment")
     verif_date = row.get("data").get("revision_requested_at")
-    rn = row.get("data").get("rejection_reason")
     reject_date = row.get("data").get("rejected_at")
     verified_at = row.get("data").get("verified_at")
     if role == "user" and (status == "submitted" or status == "verified" or status == "rejected"):
@@ -142,7 +141,7 @@ if edit_id and notes:
     st.info(f"ℹ️ Catatan Revisi:\n{notes}\n\nTanggal Pemeriksaan: {datetime.fromisoformat(verif_date).date().strftime('%d %B %Y')}")
 
 if edit_id and status == "rejected":
-    st.warning(f"❌ Alasan Ditolak:\n{rn}\n\nTanggal Ditolak: {datetime.fromisoformat(reject_date).date().strftime('%d %B %Y')}")
+    st.warning(f"❌ Alasan Ditolak:\n{notes}\n\nTanggal Ditolak: {datetime.fromisoformat(reject_date).date().strftime('%d %B %Y')}")
 elif edit_id and status == "verified":
     st.success(f"✅ Metadata telah diverifikasi dan diterima\n\nTanggal Diterima: {datetime.fromisoformat(verified_at).date().strftime('%d %B %Y')}")
 
@@ -172,6 +171,7 @@ if st.button("⬅️ Kembali ke Dashboard"):
     st.switch_page("Dashboard_.py")
     st.session_state.pop("edit_activity_id", None)  # optional reset edit mode
     st.rerun()
+
 # ===== Page tabs =====
 tab1, tab2, tab3 = st.tabs(["📘 MS Kegiatan", "📊 MS Indikator", "📈 MS Variabel"])
 
@@ -512,10 +512,15 @@ with tab1:
             disabled = is_readonly
         )
 
-        if iv_sebagian_cakupan_wilayah_pengumpulan_data == "SELURUH WILAYAH INDONESIA":
+        # if iv_sebagian_cakupan_wilayah_pengumpulan_data == "SELURUH WILAYAH INDONESIA":
+        #     iv_cakupan_wilayah_pengumpulan_data = "Seluruh Wilayah Indonesia"
+        # else:
+        #     iv_cakupan_wilayah_pengumpulan_data = "Sebagian Wilayah Indonesia" 
+
+        if "SELURUH WILAYAH INDONESIA" in iv_sebagian_cakupan_wilayah_pengumpulan_data:
             iv_cakupan_wilayah_pengumpulan_data = "Seluruh Wilayah Indonesia"
         else:
-            iv_cakupan_wilayah_pengumpulan_data = "Sebagian Wilayah Indonesia"           
+            iv_cakupan_wilayah_pengumpulan_data = "Sebagian Wilayah Indonesia"
         
         st.session_state["blok_4"]["iv_cakupan_wilayah_pengumpulan_data"] = iv_cakupan_wilayah_pengumpulan_data
         st.session_state["blok_4"]["iv_sebagian_cakupan_wilayah_pengumpulan_data"] = iv_sebagian_cakupan_wilayah_pengumpulan_data
@@ -1230,3 +1235,100 @@ if st.button("📤 Submit", disabled = is_readonly):
         st.rerun() 
     else: 
         st.error("❌ Submit gagal.")
+
+role = st.session_state.get("role", "user")
+status = st.session_state.form_data.get("status", "draft")
+
+if role == "verifier":
+    st.divider()
+    st.subheader("🔍 Verifikasi")
+
+    notes = st.text_area(
+                "Komentar",
+                value=st.session_state.form_data.get("verifier_comment", "")
+            )
+    # id_mskeg = st.text_area(
+    #             "Input ID Database",
+    #             value=st.session_state.form_data.get("id_mskeg", ""),
+    #             placeholder="Wajib diisi. Silahkan hubungi staf Prakom atau Data Engineer untuk mendapatkan ID Database"
+    #         )
+    id_mskeg = st.text_input("Masukkan ID Database", value=st.session_state.form_data.get("id_mskeg", ""),
+                             placeholder="Wajib diisi. Silahkan hubungi staf Prakom atau Data Engineer untuk mendapatkan ID Database", disabled = is_readonly)
+    col1, col2, col3 = st.columns (3)
+    with col1:
+        if st.button("📝 Request Revision"):
+            activity_id=st.session_state.current_activity_id
+            username=st.session_state.form_data.get("owner", "")
+            data={
+                    **st.session_state.form_data,
+                    "verifier_comment": notes,
+                    "id_mskeg": id_mskeg,
+                    # "verified_by": st.session_state["username"],
+                    "revision_requested_at": datetime.now().isoformat(),
+                    "status": "revision_requested"
+                }
+            # save_form(
+            #     activity_id=activity_id,
+            #     username=username,
+            #     data=data
+            # )
+            upsert_activity(
+                    activity_id=activity_id,
+                    user_id=username,
+                    payload=data,
+                    status="revision_requested",
+                )
+            st.warning(f"📝 Sent back for revision")
+            st.rerun()
+
+    with col2:
+        if st.button("✅ Accept"):
+            activity_id=st.session_state.current_activity_id
+            username=st.session_state.form_data.get("owner", "")
+            data={
+                    **st.session_state.form_data,
+                    # "verifier_comment": notes,
+                    "id_mskeg": id_mskeg,
+                    "verified_by": st.session_state["username"],
+                    "verified_at": datetime.now().isoformat(),
+                    "status": "verified"
+            }
+            # save_form(
+            #     activity_id=activity_id,
+            #     username=username,
+            #     data=data
+            # )
+            upsert_activity(
+                    activity_id=activity_id,
+                    user_id=username,
+                    payload=data,
+                    status="verified",
+                )
+            st.warning(f"✅ {judul} verified")
+            st.rerun()
+
+    with col3:
+        if st.button("❌ Reject"):
+            activity_id=st.session_state.current_activity_id
+            username=st.session_state.form_data.get("owner", "")
+            data={
+                    **st.session_state.form_data,
+                    "verifier_comment": notes,
+                    "id_mskeg": id_mskeg,
+                    # "verified_by": st.session_state["username"],
+                    "rejected_at": datetime.now().isoformat(),
+                    "status": "rejected"
+            }
+            # save_form(
+            #     activity_id=activity_id,
+            #     username=username,
+            #     data=data
+            # )
+            upsert_activity(
+                    activity_id=activity_id,
+                    user_id=username,
+                    payload=data,
+                    status="rejected",
+                )
+            st.warning(f"❌ Rejected: {judul}")
+            st.rerun()
