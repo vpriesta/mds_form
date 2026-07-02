@@ -27,7 +27,7 @@ SCOPES = [
 ]
 
 SHEET_NAME = "MS Form Temp Table"      # Google Sheet file name
-WORKSHEET_NAME = "Dev"        # Tab name
+WORKSHEET_NAME = "Prod"        # Tab name
 
 
 # @st.cache_resource
