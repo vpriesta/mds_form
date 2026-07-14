@@ -31,6 +31,7 @@ def reset_form_state():
 # --- Function to hash passwords (kept as-is) ---
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
+    st.write(f"DEBUG: Input text hashed is: {hash_password(password_input)}")
 
 # --- Retrieve credentials from secrets.toml ---
 users = st.secrets["users"]
