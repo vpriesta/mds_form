@@ -62,7 +62,7 @@ if not st.session_state.authenticated:
         else:
             st.error("Invalid username atau password")
 
-    st.write(f"DEBUG: Input text hashed is: {hash_password(password_input)}")
+    # st.write(f"DEBUG: Input text hashed is: {hash_password(password_input)}")
     st.stop()  # Prevent rest of dashboard until logged in
 
 # --- ✅ Sidebar / Logout (kept as-is) ---
