@@ -35,138 +35,47 @@ role = st.session_state["role"]
 # ===================================================== 
 # 2️⃣ HELPER LOAD & SAVE
 # ===================================================== 
-# def load_form(activity_id, username, role): 
-#     """Ambil data dari temporary base.""" 
-#     row = get_activity(activity_id) 
-#     status = row.get("status") if row else "draft"
-    
-#     if not row: 
-#         return None # wajib cocok owner 
-
-#     owner = row.get("user_id")
-#     if role == "user":
-#         if username == owner:
-#             return row.get("data", None)
-#         return None
-    
-#     # Verifier boleh baca & edit revisi
-#     if role == "verifier":
-#         return row.get("data", None)
-    
-#     # Default (should not happen)
-#     return None
-
 def load_form(activity_id, username, role): 
     """Ambil data dari temporary base.""" 
     row = get_activity(activity_id) 
+    status = row.get("status") if row else "draft"
+    
     if not row: 
-        return None 
+        return None # wajib cocok owner 
 
-    status = row.get("status") if isinstance(row, dict) else "draft"
     owner = row.get("user_id")
-
-    # Authorization check
-    if role == "user" and username != owner:
+    if role == "user":
+        if username == owner:
+            return row.get("data", None)
         return None
     
-    # Unpack the split components into a single form dictionary
-    msk = row.get("data_msk", {})
-    msv = row.get("data_msv", {})
-    msi = row.get("data_msi", {})
-    meta = row.get("metadata", {})
-
-    form_dict = {
-        "activity_id": activity_id,
-        "owner": owner,
-        "status": status,
-        "last_saved": meta.get("last_saved", ""),
-        "halaman_awal": msk.get("halaman_awal", {}),
-        "blok_1_3": msk.get("blok_1_3", {}),
-        "blok_4": msk.get("blok_4", {}),
-        "blok_5": msk.get("blok_5", {}),
-        "blok_6_8": msk.get("blok_6_8", {}),
-        "variables": msv.get("variables", []),
-        "indicators": msi.get("indicators", []),
-        "revision_note": meta.get("revision_note", ""),
-        "revision_requested_at": meta.get("revision_requested_at", ""),
-        "rejection_reason": meta.get("rejection_reason", ""),
-        "verified_by": meta.get("verified_by", ""),
-        "verifier_comment": meta.get("verifier_comment", ""),
-        "id_mskeg": meta.get("id_mskeg", ""),
-        "verified_at": meta.get("verified_at", "")
-    }
-    return form_dict
-
-# def save_form(activity_id, username, data):
-#     row = get_activity(activity_id)
-#     if not row:
-#         success, row = upsert_activity(
-#             activity_id=activity_id,
-#             user_id=username,
-#             payload=data,
-#             status="draft"
-#         )
-#         return success
+    # Verifier boleh baca & edit revisi
+    if role == "verifier":
+        return row.get("data", None)
     
-#     owner_id = row.get("user_id")   # ALWAYS USE ORIGINAL OWNER
-#     success, row = upsert_activity(
-#         activity_id=activity_id,
-#         user_id=owner_id,     # <-- fixed
-#         payload=data,
-#         status="draft",
-#     )
-#     return success
-    
+    # Default (should not happen)
+    return None
+
 def save_form(activity_id, username, data):
     row = get_activity(activity_id)
-    owner_id = row.get("user_id") if row else username
-
-    # Construct split payload structure
-    metadata_payload = {
-        "activity_id": activity_id,
-        "owner": owner_id,
-        "status": data.get("status", "draft"),
-        "last_saved": now_jakarta().strftime("%Y-%m-%d %H:%M:%S"),
-        "revision_note": data.get("revision_note", ""),
-        "revision_requested_at": data.get("revision_requested_at", ""),
-        "rejection_reason": data.get("rejection_reason", ""),
-        "verified_by": data.get("verified_by", ""),
-        "verifier_comment": data.get("verifier_comment", ""),
-        "id_mskeg": data.get("id_mskeg", ""),
-        "verified_at": data.get("verified_at", "")
-    }
-
-    msk_payload = {
-        "halaman_awal": data.get("halaman_awal", {}),
-        "blok_1_3": data.get("blok_1_3", {}),
-        "blok_4": data.get("blok_4", {}),
-        "blok_5": data.get("blok_5", {}),
-        "blok_6_8": data.get("blok_6_8", {})
-    }
-
-    msv_payload = {
-        "variables": data.get("variables", [])
-    }
-
-    msi_payload = {
-        "indicators": data.get("indicators", [])
-    }
-
-    split_payload = {
-        "metadata": metadata_payload,
-        "msk": msk_payload,
-        "msv": msv_payload,
-        "msi": msi_payload
-    }
+    if not row:
+        success, row = upsert_activity(
+            activity_id=activity_id,
+            user_id=username,
+            payload=data,
+            status="draft"
+        )
+        return success
     
+    owner_id = row.get("user_id")   # ALWAYS USE ORIGINAL OWNER
     success, row = upsert_activity(
         activity_id=activity_id,
-        user_id=owner_id,
-        payload=split_payload,
-        status=data.get("status", "draft")
+        user_id=owner_id,     # <-- fixed
+        payload=data,
+        status="draft",
     )
     return success
-
+    
 def submit_form(activity_id): 
     """Submit final ke temporary table.""" 
     row = get_activity(activity_id)
@@ -187,16 +96,17 @@ is_readonly = False
 if edit_id: 
     supa_data = load_form(edit_id, username, role) 
     row = get_activity(edit_id) 
-    status = row.get("status") if row else "draft"
+    status = row.get("status")
+    notes = row.get("data").get("verifier_comment")
+    verif_date = row.get("data").get("revision_requested_at")
+    reject_date = row.get("data").get("rejected_at")
+    verified_at = row.get("data").get("verified_at")
+    if role == "user" and (status == "submitted" or status == "verified" or status == "rejected"):
+        is_readonly = True
     
     if supa_data: 
         st.session_state.current_activity_id = edit_id
         st.session_state.form_data = supa_data.copy() 
-        
-        notes = st.session_state.form_data.get("verifier_comment", "")
-        verif_date = st.session_state.form_data.get("revision_requested_at", "")
-        reject_date = st.session_state.form_data.get("rejection_reason", "")
-        verified_at = st.session_state.form_data.get("verified_at", "")
     else: 
         st.warning("⚠️ Data tidak ditemukan. Membuat draft baru.")
         edit_id = None
@@ -1273,89 +1183,152 @@ with tab3:
     else:
         st.info("Belum ada variabel yang terdeteksi pada MS Kegiatan. Input daftar variabel pada MS Kegiatan BLOK 3")
     
-# =====================================================
-# SAVE / SUBMIT / VERIFY ACTIONS
-# =====================================================
-# =====================================================
-# SAVE / SUBMIT / VERIFY ACTIONS
-# =====================================================
-if st.button("💾 Simpan Progres", disabled=is_readonly): 
-    # 1. Sync session state components to form_data dictionary
+if st.button("💾 Simpan Progres", disabled = is_readonly): 
+     
+    # ✅ Sync semua section ke form_data dulu
     st.session_state.form_data["halaman_awal"] = st.session_state.get("halaman_awal", {})
     st.session_state.form_data["blok_1_3"] = st.session_state.get("blok_1_3", {})
+    st.session_state.form_data["variables"] = st.session_state.get("variables", [])
     st.session_state.form_data["blok_4"] = st.session_state.get("blok_4", {})
     st.session_state.form_data["blok_5"] = st.session_state.get("blok_5", {})
     st.session_state.form_data["blok_6_8"] = st.session_state.get("blok_6_8", {})
     st.session_state.form_data["indicators"] = st.session_state.get("indicators", [])
-    st.session_state.form_data["variables"] = st.session_state.get("variables", [])
-
-    # 2. Save via refactored split handler
+    
+    combined_entry = {
+        "activity_id": st.session_state.current_activity_id,
+        "owner": username,
+        "status": st.session_state.form_data.get("status", "Draft"),
+        "last_saved": now_jakarta().strftime("%Y-%m-%d %H:%M:%S"), 
+        
+        # all sections 
+        "halaman_awal": st.session_state.form_data["halaman_awal"],
+        "blok_1_3": st.session_state.form_data["blok_1_3"],
+        "variables": st.session_state.form_data["variables"],
+        "blok_4": st.session_state.form_data["blok_4"],
+        "blok_5": st.session_state.form_data["blok_5"],
+        "blok_6_8": st.session_state.form_data["blok_6_8"],
+        "indicators": st.session_state.form_data["indicators"], 
+        
+        # metadata 
+        "revision_note": st.session_state.form_data.get("revision_note", ""),
+        "revision_requested_at": st.session_state.form_data.get("revision_requested_at", ""),
+        "rejection_reason": st.session_state.form_data.get("rejection_reason", ""), 
+        "verified_by": st.session_state.form_data.get("verified_by", ""),
+        "verifier_comment": st.session_state.form_data.get("verifier_comment", "") 
+    } 
     success = save_form(
         activity_id=st.session_state.current_activity_id, 
         username=username, 
-        data=st.session_state.form_data
-    ) 
+        data=combined_entry,) 
     
     if success: 
         st.success("✅ Tersimpan!") 
     else: 
         st.error("❌ Gagal menyimpan")
 
-if st.button("📤 Submit", disabled=is_readonly): 
-    st.session_state.form_data["halaman_awal"] = st.session_state.get("halaman_awal", {})
-    st.session_state.form_data["blok_1_3"] = st.session_state.get("blok_1_3", {})
-    st.session_state.form_data["blok_4"] = st.session_state.get("blok_4", {})
-    st.session_state.form_data["blok_5"] = st.session_state.get("blok_5", {})
-    st.session_state.form_data["blok_6_8"] = st.session_state.get("blok_6_8", {})
-    st.session_state.form_data["indicators"] = st.session_state.get("indicators", [])
-    st.session_state.form_data["variables"] = st.session_state.get("variables", [])
 
+if st.button("📤 Submit", disabled = is_readonly): 
     ok = submit_form(st.session_state.current_activity_id) 
     if ok: 
+        st.session_state.form_data["status"] = "Submitted" 
         st.success("🎉 Submitted!") 
         st.rerun() 
     else: 
         st.error("❌ Submit gagal.")
 
+role = st.session_state.get("role", "user")
+status = st.session_state.form_data.get("status", "draft")
+
 if role == "verifier":
     st.divider()
     st.subheader("🔍 Verifikasi")
 
-    notes_input = st.text_area("Komentar", value=st.session_state.form_data.get("verifier_comment", ""))
-    id_mskeg_input = st.text_input("Masukkan ID Database", value=st.session_state.form_data.get("id_mskeg", ""), disabled=is_readonly)
-    
-    col1, col2, col3 = st.columns(3)
-    
+    notes = st.text_area(
+                "Komentar",
+                value=st.session_state.form_data.get("verifier_comment", "")
+            )
+    # id_mskeg = st.text_area(
+    #             "Input ID Database",
+    #             value=st.session_state.form_data.get("id_mskeg", ""),
+    #             placeholder="Wajib diisi. Silahkan hubungi staf Prakom atau Data Engineer untuk mendapatkan ID Database"
+    #         )
+    id_mskeg = st.text_input("Masukkan ID Database", value=st.session_state.form_data.get("id_mskeg", ""),
+                             placeholder="Wajib diisi. Silahkan hubungi staf Prakom atau Data Engineer untuk mendapatkan ID Database", disabled = is_readonly)
+    col1, col2, col3 = st.columns (3)
     with col1:
         if st.button("📝 Request Revision"):
-            st.session_state.form_data["verifier_comment"] = notes_input
-            st.session_state.form_data["id_mskeg"] = id_mskeg_input
-            st.session_state.form_data["revision_requested_at"] = datetime.now().isoformat()
-            st.session_state.form_data["status"] = "revision_requested"
-            
-            save_form(st.session_state.current_activity_id, username, st.session_state.form_data)
-            st.warning("📝 Sent back for revision")
+            activity_id=st.session_state.current_activity_id
+            username=st.session_state.form_data.get("owner", "")
+            data={
+                    **st.session_state.form_data,
+                    "verifier_comment": notes,
+                    "id_mskeg": id_mskeg,
+                    # "verified_by": st.session_state["username"],
+                    "revision_requested_at": datetime.now().isoformat(),
+                    "status": "revision_requested"
+                }
+            # save_form(
+            #     activity_id=activity_id,
+            #     username=username,
+            #     data=data
+            # )
+            upsert_activity(
+                    activity_id=activity_id,
+                    user_id=username,
+                    payload=data,
+                    status="revision_requested",
+                )
+            st.warning(f"📝 Sent back for revision")
             st.rerun()
 
     with col2:
         if st.button("✅ Accept"):
-            st.session_state.form_data["verifier_comment"] = notes_input
-            st.session_state.form_data["id_mskeg"] = id_mskeg_input
-            st.session_state.form_data["verified_by"] = st.session_state["username"]
-            st.session_state.form_data["verified_at"] = datetime.now().isoformat()
-            st.session_state.form_data["status"] = "verified"
-            
-            save_form(st.session_state.current_activity_id, username, st.session_state.form_data)
-            st.success("✅ Verified!")
+            activity_id=st.session_state.current_activity_id
+            username=st.session_state.form_data.get("owner", "")
+            data={
+                    **st.session_state.form_data,
+                    # "verifier_comment": notes,
+                    "id_mskeg": id_mskeg,
+                    "verified_by": st.session_state["username"],
+                    "verified_at": datetime.now().isoformat(),
+                    "status": "verified"
+            }
+            # save_form(
+            #     activity_id=activity_id,
+            #     username=username,
+            #     data=data
+            # )
+            upsert_activity(
+                    activity_id=activity_id,
+                    user_id=username,
+                    payload=data,
+                    status="verified",
+                )
+            st.warning(f"✅ {judul} verified")
             st.rerun()
 
     with col3:
         if st.button("❌ Reject"):
-            st.session_state.form_data["verifier_comment"] = notes_input
-            st.session_state.form_data["id_mskeg"] = id_mskeg_input
-            st.session_state.form_data["rejection_reason"] = notes_input
-            st.session_state.form_data["status"] = "rejected"
-            
-            save_form(st.session_state.current_activity_id, username, st.session_state.form_data)
-            st.error("❌ Rejected!")
+            activity_id=st.session_state.current_activity_id
+            username=st.session_state.form_data.get("owner", "")
+            data={
+                    **st.session_state.form_data,
+                    "verifier_comment": notes,
+                    "id_mskeg": id_mskeg,
+                    # "verified_by": st.session_state["username"],
+                    "rejected_at": datetime.now().isoformat(),
+                    "status": "rejected"
+            }
+            # save_form(
+            #     activity_id=activity_id,
+            #     username=username,
+            #     data=data
+            # )
+            upsert_activity(
+                    activity_id=activity_id,
+                    user_id=username,
+                    payload=data,
+                    status="rejected",
+                )
+            st.warning(f"❌ Rejected: {judul}")
             st.rerun()
