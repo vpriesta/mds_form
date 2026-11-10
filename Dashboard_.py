@@ -1,9 +1,10 @@
 import streamlit as st
 import hashlib
-import json
+from pathlib import Path
 from datetime import datetime
 
-# Import Google Sheet client functions
+# Supabase client helpers (from your supabase_client.py)
+
 from gsheet_client import (
     list_activities_for_user,
     list_all_activities,
@@ -27,7 +28,7 @@ def reset_form_state():
         if key in st.session_state:
             del st.session_state[key]
 
-# --- Function to hash passwords ---
+# --- Function to hash passwords (kept as-is) ---
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
@@ -62,7 +63,7 @@ if not st.session_state.authenticated:
 
     st.stop()  # Prevent rest of dashboard until logged in
 
-# --- Sidebar / Logout ---
+# --- ✅ Sidebar / Logout (kept as-is) ---
 st.sidebar.markdown(f"👤 **Masuk sebagai:** {st.session_state.username}")
 st.sidebar.markdown(f"🛡️ **Role:** {st.session_state.role}")
 if st.sidebar.button("🚪 Logout"):
@@ -72,28 +73,20 @@ if st.sidebar.button("🚪 Logout"):
 
 st.set_page_config(page_title="Kegiatan Statistik", page_icon="📋", layout="wide")
 
-# === Fetch activities from Google Sheets ===
+# === Fetch activities from Supabase ===
+# For non-verifier: list user's own activities
+# For verifier: show submitted activities (you can change to show all if you add list_all in supabase_client)
 if st.session_state.role == "verifier":
     activities = list_all_activities()
 else:
     activities = list_activities_for_user(st.session_state.user_id)
 
-# Normalize entries into UI layout shape
+# st.write("DEBUG - Raw activities from Supabase:", activities)
+
+# Normalize entries into the shape your UI expects (fallbacks for older/local JSON)
 form_list = []
 for row in activities:
     data = row.get("data") or {}
-    raw_meta = row.get("metadata") or {}
-
-    # Safely decode metadata if it's returned as a raw JSON string
-    if isinstance(raw_meta, str):
-        try:
-            meta = json.loads(raw_meta) if raw_meta.strip() else {}
-        except Exception:
-            meta = {}
-    elif isinstance(raw_meta, dict):
-        meta = raw_meta
-    else:
-        meta = {}
 
     activity_id = (
         row.get("activity_id")
@@ -107,12 +100,11 @@ for row in activities:
         or "unknown"
     )
 
-    status_raw = (
+    status = (
         row.get("status")
         or data.get("status")
         or "draft"
-    )
-    status = status_raw.replace("_", " ").title()
+    ).title()
 
     title = (
         data.get("halaman_awal", {}).get("judul")
@@ -121,8 +113,7 @@ for row in activities:
     )
 
     last_saved = (
-        meta.get("last_saved")
-        or data.get("last_saved")
+        data.get("last_saved")
         or row.get("updated_at")
         or "Unknown"
     )
@@ -136,23 +127,23 @@ for row in activities:
         "raw": row,
     })
 
-# UI helper for status icons
+# st.write("RAW ACTIVITIES:", activities)
+
+# UI helpers
 def status_color(status):
-    st_lower = status.lower()
-    if st_lower == "draft":
+    if status.lower() == "draft":
         return "⚙️"
-    elif st_lower == "submitted":
+    elif status.lower() == "submitted":
         return "📤"
-    elif st_lower in ["revision requested", "revision_requested"]:
-        return "📝"
-    elif st_lower == "verified":
+    elif status.lower() == "verified":
         return "✅"
-    elif st_lower == "rejected":
+    elif status.lower() == "rejected":
         return "❌"
     else:
-        return "📋"
+        return "❓"
 
 st.title("📋 Kegiatan Statistik")
+# st.markdown("View and manage your saved or submitted activities below.")
 
 if not form_list:
     st.info("Belum ada Kegiatan Statistik. Klik **Tambah Kegiatan** untuk memulai")
@@ -171,8 +162,10 @@ else:
             with col1:
                 if st.button("✏️ Edit", key=f"edit_{idx}"):
                     reset_form_state()
+                    # Put the activity id into session and navigate
                     st.session_state.edit_activity_id = item.get("activity_id")
                     st.switch_page("pages/1_Form_Page_.py")
+                    st.rerun()
 
             with col2:
                 if st.button("🗑️ Hapus", key=f"delete_{idx}"):
